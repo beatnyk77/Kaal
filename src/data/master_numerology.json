@@ -1,0 +1,874 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "kb_version": "0.1.0",
+    "updated_at": "2026-06-23T00:00:00Z",
+    "description": "Kaal master numerology KB — GG33 cycles, Vietnamese zodiac, arthouse33 Personal Hours",
+    "maintainer": "kartikay",
+    "license_note": "Original synthesis and engine rules by user; public GG33 themes summarized under fair-use ingestion policy (see sources).",
+    "sources": [
+      {
+        "id": "arthouse33_ph",
+        "name": "arthouse33 Personal Hours methodology",
+        "type": "user_screenshot",
+        "access": "private",
+        "ethical_note": "User-provided screenshots; encoded as calculation steps + quality tiers. Not republished verbatim.",
+        "ingestion_status": "partial"
+      },
+      {
+        "id": "gg33_public",
+        "name": "GG33 public numerology themes",
+        "type": "public_web",
+        "url": "https://www.gg33.app",
+        "access": "open",
+        "last_verified": "2026-06-23",
+        "ethical_note": "Ingest themes and cycle logic only; no paywalled academy content scraped.",
+        "ingestion_status": "partial"
+      },
+      {
+        "id": "gg33_academy",
+        "name": "GG33 Academy",
+        "type": "academy",
+        "url": "https://gg33academy.org",
+        "access": "subscription",
+        "ethical_note": "Manual notes from subscriber learning only; never bulk-scrape.",
+        "ingestion_status": "planned"
+      },
+      {
+        "id": "viet_zodiac",
+        "name": "Vietnamese zodiac references",
+        "type": "public_web",
+        "url": "https://en.wikipedia.org/wiki/Cat_(zodiac)",
+        "access": "open",
+        "last_verified": "2026-06-23",
+        "ethical_note": "Cat-vs-Rabbit distinction and triad/enemy tables from open references.",
+        "ingestion_status": "complete"
+      },
+      {
+        "id": "kala_engine",
+        "name": "Kaal Phase 0 engine defaults",
+        "type": "engine_derived",
+        "access": "private",
+        "ethical_note": "Locked from personalHour.ts + gg33Viet.ts verification tables.",
+        "ingestion_status": "complete"
+      }
+    ],
+    "changelog": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-23",
+        "changes": [
+          "Initial schema + calculation methods",
+          "Number profiles 4, 8, 9, 22 populated",
+          "Vietnamese Cat zodiac example",
+          "arthouse33 Personal Hour steps + quality table",
+          "Cross-system fusion rules v1"
+        ],
+        "breaking": false
+      }
+    ],
+    "calibration_flags": [
+      "compatibility.number_matrix.entries — confirm against arthouse33 screenshot grid",
+      "personal_hour.calibration.offset — verify hand-count vs verify:ph table",
+      "zodiac.lunar_new_year_boundaries — add exact solar/lunar cutover dates"
+    ]
+  },
+  "calculation_methods": {
+    "reduction": {
+      "algorithm": "digital_root",
+      "preserve_masters": true,
+      "master_numbers": [11, 22, 33],
+      "reduce_masters_in_contexts": ["personal_year", "personal_month", "personal_day"]
+    },
+    "birth_time_number": {
+      "id": "btn",
+      "label": "Birth Time Number (BTN)",
+      "formula": "Sum all digits of birth time HH:MM until single digit or master",
+      "inputs": ["birth_hour", "birth_minute"],
+      "output": "btn",
+      "reduction": "digital_root_preserve_masters",
+      "gg33_notes": "BTN anchors Personal Hour count. Example: 20:20 → 2+0+2+0 = 4.",
+      "examples": [
+        {
+          "input": { "birth_time": "20:20" },
+          "steps": ["2+0+2+0 = 4"],
+          "result": 4
+        }
+      ]
+    },
+    "personal_year": {
+      "id": "personal_year",
+      "label": "GG33 Personal Year",
+      "formula": "birth_month + birth_day + current_calendar_year → reduce",
+      "inputs": ["birth_month", "birth_day", "current_year"],
+      "output": "personal_year",
+      "reduction": "digital_root (masters noted but typically reduced for cycle position)",
+      "gg33_notes": "9-year cycle; year theme sets the macro tone. Universal Year runs in parallel (reduce current_year alone).",
+      "examples": [
+        {
+          "input": { "birth_month": 5, "birth_day": 15, "current_year": 2026 },
+          "steps": ["5+15+2026 = 2046", "2+0+4+6 = 12", "1+2 = 3"],
+          "result": 3
+        }
+      ]
+    },
+    "personal_month": {
+      "id": "personal_month",
+      "label": "Personal Month",
+      "formula": "personal_year + current_calendar_month → reduce",
+      "inputs": ["personal_year", "current_month"],
+      "output": "personal_month",
+      "reduction": "digital_root"
+    },
+    "personal_day": {
+      "id": "personal_day",
+      "label": "Personal Day",
+      "formula": "personal_month + current_calendar_day → reduce",
+      "inputs": ["personal_month", "current_day"],
+      "output": "personal_day",
+      "reduction": "digital_root",
+      "gg33_notes": "Primary daily timing number for personal resonance (distinct from Universal/Daily date number)."
+    },
+    "daily_numbers": {
+      "universal_day": {
+        "id": "universal_day",
+        "label": "Universal Day Number",
+        "formula": "current_month + current_day + current_year → reduce",
+        "inputs": ["current_month", "current_day", "current_year"],
+        "output": "universal_day",
+        "reduction": "digital_root",
+        "gg33_notes": "Collective/global flavor of the calendar day."
+      },
+      "date_digit_sum": {
+        "id": "date_digit_sum",
+        "label": "Full Date Digit Sum",
+        "formula": "Sum every digit in MMDDYYYY → reduce",
+        "inputs": ["current_date_digits"],
+        "output": "date_digit_sum",
+        "reduction": "digital_root",
+        "gg33_notes": "Alternate GG33 daily read; useful for address/date synchronicities."
+      },
+      "personal_day_primary": {
+        "id": "personal_day_primary",
+        "label": "Personal Day (primary engine method)",
+        "formula": "See personal_day",
+        "inputs": ["birth_month", "birth_day", "current_year", "current_month", "current_day"],
+        "output": "personal_day",
+        "reduction": "digital_root",
+        "gg33_notes": "Kaal engine uses this as the main daily number."
+      }
+    },
+    "personal_hour": {
+      "id": "personal_hour_arthouse33",
+      "source": "arthouse33",
+      "label": "Personal Hour (11 PM anchor)",
+      "reference_anchor": "23:00 local on the previous calendar night (if now < today's 23:00, use yesterday's 23:00)",
+      "window_rule": "Each Personal Hour window runs from transition_minute past clock hour H to transition_minute past H+1",
+      "steps": [
+        {
+          "step": 1,
+          "action": "Compute BTN from birth time",
+          "detail": "Reduce HH:MM digits to single digit or master (11/22/33)",
+          "formula": "btn = reduce_digits(birth_hour, birth_minute)"
+        },
+        {
+          "step": 2,
+          "action": "Set transition_minute",
+          "detail": "Use birth minute (e.g. 20:20 → :20)",
+          "formula": "transition_minute = birth_minute"
+        },
+        {
+          "step": 3,
+          "action": "Find reference 11 PM",
+          "detail": "Previous 23:00 local before current moment",
+          "formula": "ref_11pm = max(23:00) where ref_11pm <= now"
+        },
+        {
+          "step": 4,
+          "action": "Determine active clock hour",
+          "detail": "If current minute >= transition_minute, active = current hour; else active = previous hour (wrap midnight)",
+          "formula": "active_hour = minute >= transition ? hour : hour-1"
+        },
+        {
+          "step": 5,
+          "action": "Count full hours since reference",
+          "detail": "Floor whole hours from ref_11pm to start of active_hour",
+          "formula": "hours_since_ref = floor((active_hour_start - ref_11pm) / 1h)"
+        },
+        {
+          "step": 6,
+          "action": "Compute raw Personal Hour",
+          "detail": "Add BTN + hours_since_ref + optional calibration offset",
+          "formula": "raw = btn + hours_since_ref + calibration_offset"
+        },
+        {
+          "step": 7,
+          "action": "Reduce unless master",
+          "detail": "If raw is 11, 22, or 33 keep; else digital root to single digit",
+          "formula": "ph = preserve_master(raw)"
+        },
+        {
+          "step": 8,
+          "action": "Lookup quality tier",
+          "detail": "Map ph to best | friendly | caution | neutral using arthouse33 table",
+          "formula": "quality = lookup(ph)"
+        }
+      ],
+      "quality_lookup": {
+        "source": "arthouse33_personal_hours",
+        "scope": "global",
+        "tiers": {
+          "best": [6, 8, 9, 11, 22, 33],
+          "friendly": [1, 2, 7],
+          "caution": [3, 5],
+          "neutral": [4]
+        },
+        "per_core_overrides": {}
+      },
+      "calibration": {
+        "offset_field": "calibration_offset",
+        "default_offset": 0,
+        "verify_script": "bun run verify:ph"
+      }
+    }
+  },
+  "number_profiles": {
+    "4": {
+      "id": 4,
+      "label": "The Builder",
+      "type": "root",
+      "archetype": "Foundation, discipline, systems, Rahu-flavored disruption channeled into structure",
+      "core_themes": [
+        "Structure and long-term foundation",
+        "Discipline, routine, reliability",
+        "Hard work before reward",
+        "Systems, SOPs, architecture",
+        "Patience and endurance"
+      ],
+      "shadow_themes": [
+        "Rigidity and over-control",
+        "Workaholism",
+        "Pessimism under pressure",
+        "Resistance to change"
+      ],
+      "best_actions": [
+        "Build systems, SOPs, and infrastructure",
+        "Financial planning and budgeting",
+        "Property, logistics, operations",
+        "Deep focused work blocks",
+        "Health routines and habit stacking",
+        "Documentation and contracts"
+      ],
+      "caution_actions": [
+        "Impulsive pivots without a plan",
+        "Speculative gambling or reckless risk",
+        "Over-promising timelines",
+        "Micromanaging when delegation is needed",
+        "Ignoring body signals for 'one more hour'"
+      ],
+      "friendly_numbers": [1, 2, 6, 7, 8],
+      "enemy_numbers": [3, 5, 9],
+      "neutral_numbers": [4],
+      "graha": {
+        "primary": "Rahu",
+        "sanskrit": "Rahu",
+        "western": "Uranus (modern association)",
+        "element": "air",
+        "weekday_lord": false,
+        "notes": "North node / shadow amplifier; 4 builds by metabolizing chaos into order."
+      },
+      "personal_year_affinity": {
+        "amplified": [4, 22],
+        "supportive": [1, 2, 6, 8],
+        "challenging": [3, 5, 9]
+      },
+      "action_tags": ["build", "plan", "contract", "operations", "health_routine", "property"],
+      "gg33_flavor": "Core 4 years demand proof-of-work; visibility without foundation backfires.",
+      "sources": ["gg33_public", "kala_engine", "arthouse33_ph"],
+      "calibration_status": "confirmed"
+    },
+    "8": {
+      "id": 8,
+      "label": "The Powerhouse",
+      "type": "root",
+      "archetype": "Authority, karma, material mastery, Saturnian harvest",
+      "core_themes": [
+        "Power, authority, and executive decision",
+        "Money, assets, and ROI",
+        "Karmic accountability",
+        "Negotiation and deal-making",
+        "Scale and institutional leverage"
+      ],
+      "shadow_themes": [
+        "Control through fear",
+        "Materialism without ethics",
+        "Burnout from over-ownership"
+      ],
+      "best_actions": [
+        "Negotiations, contracts, and closes",
+        "Fundraising and investor conversations",
+        "Pricing and revenue architecture",
+        "Legal and compliance milestones",
+        "Public authority moves (when supported)"
+      ],
+      "caution_actions": [
+        "Ego-driven power plays on weak days",
+        "Signing without counsel",
+        "Cutting corners on ethics",
+        "Over-leveraging"
+      ],
+      "friendly_numbers": [2, 4, 6, 9],
+      "enemy_numbers": [1, 3, 5],
+      "neutral_numbers": [7, 8],
+      "graha": {
+        "primary": "Saturn",
+        "sanskrit": "Shani",
+        "western": "Saturn",
+        "element": "earth",
+        "weekday_lord": true,
+        "notes": "Saturday lord; slow compounding, delayed gratification, structural authority."
+      },
+      "personal_year_affinity": {
+        "amplified": [8],
+        "supportive": [2, 4, 6],
+        "challenging": [1, 3, 5]
+      },
+      "action_tags": ["negotiate", "deal", "money", "authority", "legal", "scale"],
+      "gg33_flavor": "8 hours/years reward patience + proof; best for high-stakes material moves.",
+      "sources": ["gg33_public", "arthouse33_ph"],
+      "calibration_status": "confirmed"
+    },
+    "9": {
+      "id": 9,
+      "label": "The Humanitarian Closer",
+      "type": "root",
+      "archetype": "Completion, Mars drive, release, legacy",
+      "core_themes": [
+        "Endings and completion",
+        "Compassion and big-picture vision",
+        "Courageous action",
+        "Letting go of what expired",
+        "Legacy and transmission"
+      ],
+      "shadow_themes": [
+        "Emotional volatility",
+        "Martyr complex",
+        "Dramatic burns bridges"
+      ],
+      "best_actions": [
+        "Closing loops and shipping v1",
+        "Charitable or mission-aligned launches",
+        "Courageous conversations",
+        "Creative culmination",
+        "Clearing debt (financial or energetic)"
+      ],
+      "caution_actions": [
+        "Starting brand-new long arcs without closure",
+        "Passive-aggressive endings",
+        "Revenge moves"
+      ],
+      "friendly_numbers": [1, 3, 6, 8, 9],
+      "enemy_numbers": [4, 5, 7],
+      "neutral_numbers": [2],
+      "graha": {
+        "primary": "Mars",
+        "sanskrit": "Mangal",
+        "western": "Mars",
+        "element": "fire",
+        "weekday_lord": true,
+        "notes": "Tuesday lord; decisive energy, completion through action."
+      },
+      "personal_year_affinity": {
+        "amplified": [9],
+        "supportive": [3, 6, 8],
+        "challenging": [4, 5, 7]
+      },
+      "action_tags": ["close", "release", "launch_finale", "courage", "legacy", "clear"],
+      "gg33_flavor": "9 Personal Hours excellent for decisive completion; pair with friendly zodiac for launches.",
+      "sources": ["gg33_public", "arthouse33_ph"],
+      "calibration_status": "confirmed"
+    },
+    "22": {
+      "id": 22,
+      "label": "Master Builder",
+      "type": "master",
+      "archetype": "Manifesting large-scale vision into concrete form",
+      "core_themes": [
+        "Master-level construction",
+        "Institutional and civilizational builds",
+        "Vision + logistics fusion",
+        "High responsibility leadership"
+      ],
+      "shadow_themes": [
+        "Collapse under unrealistic scope",
+        "Spiritual bypass of practical steps"
+      ],
+      "best_actions": [
+        "Multi-year strategic planning",
+        "Institutional partnerships",
+        "Infrastructure at scale",
+        "Hiring key lieutenants",
+        "Board-level decisions"
+      ],
+      "caution_actions": [
+        "Petty tasks that waste master bandwidth",
+        "Unstructured brainstorming without owners",
+        "Shortcuts on compliance"
+      ],
+      "friendly_numbers": [2, 4, 6, 8],
+      "enemy_numbers": [3, 5],
+      "neutral_numbers": [1, 7, 9, 11, 33],
+      "graha": {
+        "primary": "Saturn-Jupiter bridge",
+        "sanskrit": "Shani-Guru",
+        "western": "Saturn + Jupiter",
+        "element": "earth",
+        "weekday_lord": false,
+        "notes": "Master number; not reduced in Personal Hour context."
+      },
+      "personal_year_affinity": {
+        "amplified": [4, 22],
+        "supportive": [6, 8],
+        "challenging": [3, 5]
+      },
+      "action_tags": ["master_build", "institution", "scale", "vision_to_form"],
+      "gg33_flavor": "22 Personal Hour = rare high-conviction window for structural leaps.",
+      "sources": ["gg33_public", "arthouse33_ph"],
+      "calibration_status": "confirmed"
+    }
+  },
+  "compatibility": {
+    "number_matrix": {
+      "description": "Symmetric numerology compatibility matrix. arthouse33 screenshot may refine tension vs enemy edges.",
+      "symmetric": true,
+      "levels": ["ally", "friendly", "neutral", "tension", "enemy"],
+      "entries": [
+        { "a": 4, "b": 1, "level": "friendly", "note": "1 initiates, 4 stabilizes" },
+        { "a": 4, "b": 2, "level": "friendly" },
+        { "a": 4, "b": 3, "level": "enemy", "note": "3 scatter vs 4 structure" },
+        { "a": 4, "b": 4, "level": "ally", "note": "Double foundation — powerful but rigid" },
+        { "a": 4, "b": 5, "level": "enemy", "note": "5 change vs 4 order" },
+        { "a": 4, "b": 6, "level": "friendly" },
+        { "a": 4, "b": 7, "level": "friendly" },
+        { "a": 4, "b": 8, "level": "ally", "note": "Material mastery stack" },
+        { "a": 4, "b": 9, "level": "tension" },
+        { "a": 8, "b": 2, "level": "friendly" },
+        { "a": 8, "b": 4, "level": "ally" },
+        { "a": 8, "b": 6, "level": "friendly" },
+        { "a": 8, "b": 9, "level": "friendly" },
+        { "a": 8, "b": 1, "level": "tension" },
+        { "a": 8, "b": 3, "level": "enemy" },
+        { "a": 8, "b": 5, "level": "enemy" },
+        { "a": 9, "b": 1, "level": "friendly" },
+        { "a": 9, "b": 3, "level": "friendly" },
+        { "a": 9, "b": 6, "level": "friendly" },
+        { "a": 9, "b": 8, "level": "friendly" },
+        { "a": 9, "b": 4, "level": "tension" },
+        { "a": 9, "b": 5, "level": "enemy" },
+        { "a": 9, "b": 7, "level": "enemy" },
+        { "a": 22, "b": 4, "level": "ally" },
+        { "a": 22, "b": 8, "level": "friendly" },
+        { "a": 22, "b": 3, "level": "enemy" },
+        { "a": 22, "b": 5, "level": "enemy" }
+      ]
+    },
+    "personal_hour_quality": {
+      "source": "arthouse33_personal_hours",
+      "scope": "global",
+      "tiers": {
+        "best": [6, 8, 9, 11, 22, 33],
+        "friendly": [1, 2, 7],
+        "caution": [3, 5],
+        "neutral": [4]
+      },
+      "per_core_overrides": {}
+    },
+    "core_amplification": {
+      "description": "When runtime number matches user core/life path, themes amplify.",
+      "when_personal_hour_equals_core": "Neutral numerically but identity-mirror hour — good for self-alignment, not automatically best tier.",
+      "when_personal_day_equals_core": "Personal resonance day — prioritize core-themed actions.",
+      "when_personal_year_equals_core": "Major life theme year; 4-year energy stacking applies for Core 4."
+    }
+  },
+  "zodiac": {
+    "tradition": "vietnamese",
+    "vietnam_distinctions": [
+      "Cat replaces Rabbit in the 12-year cycle (index 3)",
+      "Tết (lunar new year) boundary may shift animal for Jan–Feb dates",
+      "Cat emphasized in folk symbolism: vigilance, grace, home protection"
+    ],
+    "lunar_new_year_note": "Engine default uses calendar year; upgrade to solar/lunar boundary table in extensions.lunar_boundaries.",
+    "animals": [
+      {
+        "id": "cat",
+        "name": "Cat",
+        "vietnamese_name": "Mèo",
+        "chinese_equivalent": "Rabbit",
+        "index": 3,
+        "element_cycle_base": "wood",
+        "primary_number": 3,
+        "core_themes": [
+          "Refinement and aesthetic intelligence",
+          "Home, diplomacy, and quiet strategy",
+          "Vigilance without aggression",
+          "Social grace and networking"
+        ],
+        "best_actions": [
+          "Relationship building and soft outreach",
+          "Design, brand, and creative polish",
+          "Home and space improvements",
+          "Behind-the-scenes negotiations"
+        ],
+        "caution_actions": [
+          "Hard confrontation on enemy days",
+          "Over-isolation",
+          "Passive avoidance of necessary conflict"
+        ],
+        "friendly_animals": ["goat", "pig", "dog"],
+        "enemy_animals": ["rooster"],
+        "neutral_animals": ["rat", "ox", "tiger", "dragon", "snake", "horse", "monkey"],
+        "number_synergy": {
+          "amplified_numbers": [3, 6],
+          "friendly_numbers": [2, 4, 9],
+          "caution_numbers": [5, 7]
+        },
+        "synergy_rules": {
+          "triad": ["cat", "goat", "pig"],
+          "enemy": "rooster",
+          "self": "cat",
+          "hidden_friend": ["dog"]
+        },
+        "vietnam_note": "Cat triad (Cat-Goat-Pig) is the Vietnam-specific harmony group; Rooster opposes Cat on the wheel.",
+        "sources": ["viet_zodiac", "gg33_public"]
+      }
+    ],
+    "triads": {
+      "first": ["rat", "dragon", "monkey"],
+      "second": ["ox", "snake", "rooster"],
+      "third": ["tiger", "horse", "dog"],
+      "fourth": ["cat", "goat", "pig"]
+    },
+    "enemies": {
+      "rat": "horse",
+      "ox": "goat",
+      "tiger": "monkey",
+      "cat": "rooster",
+      "dragon": "dog",
+      "snake": "pig",
+      "horse": "rat",
+      "goat": "ox",
+      "monkey": "tiger",
+      "rooster": "cat",
+      "dog": "dragon",
+      "pig": "snake"
+    },
+    "hidden_friends": {
+      "rat": ["ox"],
+      "ox": ["rat"],
+      "tiger": ["pig"],
+      "cat": ["dog"],
+      "dragon": ["rooster"],
+      "snake": ["monkey"],
+      "horse": ["goat"],
+      "goat": ["horse"],
+      "monkey": ["snake"],
+      "rooster": ["dragon"],
+      "dog": ["cat"],
+      "pig": ["tiger"]
+    },
+    "number_animal_map": {
+      "rat": 1,
+      "ox": 2,
+      "tiger": 3,
+      "cat": 3,
+      "dragon": 5,
+      "snake": 6,
+      "horse": 7,
+      "goat": 8,
+      "monkey": 9,
+      "rooster": 1,
+      "dog": 2,
+      "pig": 9
+    }
+  },
+  "personal_year": {
+    "formula": "birth_month + birth_day + current_year → reduce to 1-9",
+    "cycle_length": 9,
+    "phases": {
+      "1": {
+        "number": 1,
+        "theme": "Initiation & planting",
+        "keywords": ["start", "seed", "identity", "courage"],
+        "best_actions": ["New projects", "Personal rebranding", "Solo decisions"],
+        "caution_actions": ["Overcommitting", "Ignoring partnerships"]
+      },
+      "2": {
+        "number": 2,
+        "theme": "Partnership & patience",
+        "keywords": ["alliance", "waiting", "diplomacy"],
+        "best_actions": ["Collaborations", "Relationship repair", "Listening tours"],
+        "caution_actions": ["Forcing timelines", "People-pleasing"]
+      },
+      "3": {
+        "number": 3,
+        "theme": "Expression & visibility",
+        "keywords": ["voice", "creative", "social"],
+        "best_actions": ["Content", "Speaking", "Creative launches"],
+        "caution_actions": ["Scattered hype", "Overspending on image"]
+      },
+      "4": {
+        "number": 4,
+        "theme": "Foundation & discipline",
+        "keywords": ["work", "structure", "health", "systems"],
+        "best_actions": ["SOPs", "Asset building", "Fitness baselines", "Budgeting"],
+        "caution_actions": ["Shortcuts", "Burnout", "Rigid control"]
+      },
+      "5": {
+        "number": 5,
+        "theme": "Change & mobility",
+        "keywords": ["travel", "pivot", "freedom"],
+        "best_actions": ["Experiments", "Travel", "Offer pivots"],
+        "caution_actions": ["Reckless change", "Abandoning core systems"]
+      },
+      "6": {
+        "number": 6,
+        "theme": "Responsibility & harmony",
+        "keywords": ["family", "duty", "service"],
+        "best_actions": ["Team care", "Home", "Client success"],
+        "caution_actions": ["Martyrdom", "Over-functioning"]
+      },
+      "7": {
+        "number": 7,
+        "theme": "Inner work & analysis",
+        "keywords": ["study", "spiritual", "research"],
+        "best_actions": ["Deep learning", "Retreat", "Analytics"],
+        "caution_actions": ["Isolation", "Analysis paralysis"]
+      },
+      "8": {
+        "number": 8,
+        "theme": "Power & harvest",
+        "keywords": ["money", "authority", "karma"],
+        "best_actions": ["Deals", "Raises", "Institutional moves"],
+        "caution_actions": ["Ethical corners", "Power games"]
+      },
+      "9": {
+        "number": 9,
+        "theme": "Completion & release",
+        "keywords": ["endings", "legacy", "clearing"],
+        "best_actions": ["Shipping finales", "Clearing debt", "Donations"],
+        "caution_actions": ["Clinging", "Dramatic cuts"]
+      }
+    },
+    "four_year_energy": {
+      "description": "For Core 4 natives, Personal Years 4 and 8 form a structural/karmic pulse within each 9-year cycle; every ~4 years the 'build → harvest' dyad intensifies.",
+      "pattern": "PY 4 (foundation) → +4 years ≈ PY 8 (harvest/authority) within the same macro cycle",
+      "years_in_cycle": [4, 8],
+      "core_4_guidance": {
+        "summary": "When your life path is 4, Personal Year 4 is double-4: maximum foundation energy — not flashy, but destiny-level structuring. Personal Year 8 in the same 9-year cycle rewards what PY4 built.",
+        "personal_year_4": "Treat as a 12-month boot camp for systems, body, and balance sheet. Say no to distraction pivots. Best for Kaal user: stack Personal Hour 8/22 + friendly zodiac for contract signing.",
+        "personal_year_8": "Harvest year for Core 4 — promotions, asset consolidation, legal wins if PY4 work was honest. Enemy zodiac days still caution against ego moves.",
+        "stacking_rules": [
+          "personal_year == 4 AND core == 4 → amplification_factor 1.35",
+          "personal_year == 8 AND core == 4 → harvest_window; pair with PH best tier",
+          "personal_day == 4 during PY4 → micro-foundation day; schedule deep work",
+          "personal_hour quality 'best' during PY4 → rare confluence for material commitments"
+        ],
+        "four_year_block_map": [
+          {
+            "block_start_py": 1,
+            "years": ["1 seed", "2 partner", "3 express", "4 BUILD"],
+            "emphasis": "First build checkpoint at PY4"
+          },
+          {
+            "block_start_py": 5,
+            "years": ["5 change", "6 duty", "7 inner", "8 HARVEST"],
+            "emphasis": "Harvest checkpoint at PY8"
+          }
+        ]
+      }
+    },
+    "core_resonance_rules": [
+      {
+        "id": "core_py_match",
+        "condition": "personal_year == user_core",
+        "effect": "Macro theme mirrors life path; apply profile.personal_year_affinity.amplified",
+        "strength_modifier": 0.15,
+        "applies_to": ["year_planning", "fusion"]
+      },
+      {
+        "id": "core_pd_match",
+        "condition": "personal_day == user_core",
+        "effect": "Daily resonance; prioritize core best_actions",
+        "strength_modifier": 0.1,
+        "applies_to": ["daily_planning", "fusion"]
+      },
+      {
+        "id": "core_ph_match",
+        "condition": "personal_hour == user_core",
+        "effect": "Identity mirror hour; neutral tier unless also best/friendly",
+        "strength_modifier": 0.05,
+        "applies_to": ["hourly_timing"]
+      }
+    ]
+  },
+  "cross_system_rules": [
+    {
+      "id": "deal_window_high",
+      "name": "High conviction deal window",
+      "priority": 10,
+      "description": "Personal Hour 8 + friendly zodiac + Shukla tithi + strong yoga",
+      "conditions": [
+        { "signal": "personal_hour", "operator": "eq", "value": 8 },
+        { "signal": "personal_hour_quality", "operator": "eq", "value": "best" },
+        { "signal": "zodiac_synergy", "operator": "in", "value": ["friendly", "self"] },
+        { "signal": "tithi_phase", "operator": "eq", "value": "shukla" },
+        { "signal": "yoga_strength", "operator": "gte", "value": "strong" }
+      ],
+      "outcome": {
+        "recommendation_strength": "very_high",
+        "verdict_bias": 25,
+        "suggested_actions": [
+          "Negotiations and deal closing",
+          "Contract signing",
+          "Pricing and revenue decisions",
+          "Investor or authority conversations"
+        ],
+        "domains": ["money", "legal", "authority"],
+        "explanation_template": "PH {personal_hour} (best) + {zodiac_synergy} zodiac + Shukla {tithi} + {yoga} yoga → high-stakes material window."
+      },
+      "examples": [
+        "PH 8 + friendly Cat day + Shukla Panchami + Siddha yoga → sign partnership agreement"
+      ],
+      "tags": ["deals", "8", "panchang"]
+    },
+    {
+      "id": "master_build_window",
+      "name": "Master builder confluence",
+      "priority": 9,
+      "description": "Personal Hour 22 or 33 with supportive personal day and non-enemy zodiac",
+      "conditions": [
+        { "signal": "personal_hour", "operator": "in", "value": [22, 33] },
+        { "signal": "zodiac_synergy", "operator": "not_in", "value": ["enemy"] },
+        { "signal": "number_compatibility", "operator": "in", "value": ["ally", "friendly"] }
+      ],
+      "outcome": {
+        "recommendation_strength": "very_high",
+        "verdict_bias": 22,
+        "suggested_actions": [
+          "Institutional planning",
+          "Multi-year roadmap commits",
+          "Hire key roles",
+          "Infrastructure investments"
+        ],
+        "domains": ["build", "scale"],
+        "explanation_template": "Master PH {personal_hour} with {zodiac_synergy} zodiac and compatible personal day."
+      },
+      "tags": ["master", "22", "33"]
+    },
+    {
+      "id": "core4_foundation_day",
+      "name": "Core 4 foundation stack",
+      "priority": 8,
+      "description": "Personal Year 4 + Personal Day 4 + PH neutral/4 for deep structural work",
+      "conditions": [
+        { "signal": "personal_year", "operator": "eq", "value": 4 },
+        { "signal": "personal_day", "operator": "eq", "value": 4 },
+        { "signal": "core_match", "operator": "eq", "value": 4 }
+      ],
+      "outcome": {
+        "recommendation_strength": "high",
+        "verdict_bias": 15,
+        "suggested_actions": [
+          "SOP documentation",
+          "Financial reconciliation",
+          "Property/logistics planning",
+          "Health protocol design"
+        ],
+        "caution_actions": ["Launch parties", "Speculative bets"],
+        "domains": ["build", "health", "operations"],
+        "explanation_template": "Triple-4 resonance — foundation day for Core 4."
+      },
+      "tags": ["core_4", "personal_year", "four_year_energy"]
+    },
+    {
+      "id": "caution_triple_friction",
+      "name": "Triple friction — avoid high stakes",
+      "priority": 20,
+      "description": "PH caution + enemy zodiac + Krishna tithi",
+      "conditions": [
+        { "signal": "personal_hour_quality", "operator": "eq", "value": "caution" },
+        { "signal": "zodiac_synergy", "operator": "eq", "value": "enemy" },
+        { "signal": "tithi_phase", "operator": "eq", "value": "krishna" }
+      ],
+      "outcome": {
+        "recommendation_strength": "avoid",
+        "verdict_bias": -25,
+        "suggested_actions": ["Maintenance", "Review", "Rest"],
+        "caution_actions": ["Signing", "Confrontation", "Large purchases"],
+        "domains": ["risk_management"],
+        "explanation_template": "Caution PH + enemy animal + waning tithi — protect energy."
+      },
+      "tags": ["caution", "avoid"]
+    },
+    {
+      "id": "friendly_ph_launch",
+      "name": "Friendly PH creative launch",
+      "priority": 7,
+      "description": "PH friendly/best + personal day friendly to core + friendly zodiac",
+      "conditions": [
+        { "signal": "personal_hour_quality", "operator": "in", "value": ["best", "friendly"] },
+        { "signal": "zodiac_synergy", "operator": "in", "value": ["friendly", "self"] },
+        { "signal": "number_compatibility", "operator": "in", "value": ["ally", "friendly"] }
+      ],
+      "outcome": {
+        "recommendation_strength": "high",
+        "verdict_bias": 18,
+        "suggested_actions": [
+          "Ship creative work",
+          "Publish content",
+          "Pitch and present",
+          "Start alliances"
+        ],
+        "domains": ["creative", "visibility"],
+        "explanation_template": "Aligned numerology + zodiac — favorable launch window."
+      },
+      "tags": ["launch", "friendly"]
+    }
+  ],
+  "query_indices": {
+    "by_number": {
+      "4": "number_profiles.4",
+      "8": "number_profiles.8",
+      "9": "number_profiles.9",
+      "22": "number_profiles.22"
+    },
+    "by_animal": {
+      "cat": "zodiac.animals[id=cat]"
+    },
+    "by_graha": {
+      "rahu": "number_profiles.4",
+      "shani": "number_profiles.8",
+      "mangal": "number_profiles.9"
+    },
+    "by_action_tag": {
+      "negotiate": ["number_profiles.8", "cross_system_rules[deal_window_high]"],
+      "build": ["number_profiles.4", "number_profiles.22", "cross_system_rules[core4_foundation_day]"],
+      "close": ["number_profiles.9"],
+      "deal": ["number_profiles.8", "cross_system_rules[deal_window_high]"]
+    }
+  },
+  "extensions": {
+    "lunar_boundaries": {
+      "status": "planned",
+      "note": "Per-year Tết datetime table for accurate animal assignment Jan-Feb"
+    },
+    "user_overrides": {
+      "status": "planned",
+      "note": "Per-user calibration_offset, per_core PH overrides, learned weights"
+    },
+    "panchang_yogas": {
+      "status": "planned",
+      "note": "Named yoga strength lookup for cross_system_rules"
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kala.local/schemas/user_profile.schema.json",
+  "title": "Kala User Profile",
+  "description": "Local-first user intelligence profile — birth, numerology, PH tiers, jyotish location, learned preferences.",
+  "type": "object",
+  "required": ["id", "schema_version", "created_at", "updated_at", "identity", "birth", "numerology", "personal_hours", "location", "preferences"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "identity": {
+      "type": "object",
+      "required": ["display_name"],
+      "properties": {
+        "display_name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "avatar_url": { "type": "string", "format": "uri" }
+      }
+    },
+    "birth": {
+      "type": "object",
+      "required": ["date", "time", "timezone_offset_minutes"],
+      "properties": {
+        "date": { "type": "string", "format": "date", "description": "YYYY-MM-DD" },
+        "time": { "type": "string", "pattern": "^\\d{1,2}:\\d{2}$", "description": "HH:MM local birth time" },
+        "timezone_offset_minutes": { "type": "integer", "description": "Minutes east of UTC at birth (IST=330)" },
+        "place_name": { "type": "string" }
+      }
+    },
+    "numerology": {
+      "type": "object",
+      "required": ["core_number", "btn"],
+      "properties": {
+        "core_number": { "type": "integer", "minimum": 1, "maximum": 33 },
+        "life_path": { "type": "integer" },
+        "btn": { "type": "integer", "description": "Birth Time Number" },
+        "gg33": {
+          "type": "object",
+          "required": ["birth_month", "birth_day", "birth_year"],
+          "properties": {
+            "birth_month": { "type": "integer", "minimum": 1, "maximum": 12 },
+            "birth_day": { "type": "integer", "minimum": 1, "maximum": 31 },
+            "birth_year": { "type": "integer" },
+            "year_animal": { "type": "string" }
+          }
+        }
+      }
+    },
+    "personal_hours": {
+      "type": "object",
+      "required": ["transition_minute", "quality_tiers"],
+      "properties": {
+        "transition_minute": { "type": "integer", "minimum": 0, "maximum": 59 },
+        "calibration_offset": { "type": "integer", "default": 0 },
+        "quality_tiers": {
+          "type": "object",
+          "required": ["best", "friendly", "caution"],
+          "properties": {
+            "best": { "type": "array", "items": { "type": "integer" } },
+            "friendly": { "type": "array", "items": { "type": "integer" } },
+            "caution": { "type": "array", "items": { "type": "integer" } },
+            "source": { "enum": ["arthouse33_default", "user_override", "learned"] }
+          }
+        },
+        "learned_hour_weights": {
+          "type": "object",
+          "description": "Phase 1: per-PH outcome bias from action logs (-1..+1)",
+          "additionalProperties": { "type": "number", "minimum": -1, "maximum": 1 }
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "required": ["latitude", "longitude", "timezone_offset_minutes"],
+      "description": "Current/default location for panchang + jyotish",
+      "properties": {
+        "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+        "longitude": { "type": "number", "minimum": -180, "maximum": 180 },
+        "timezone_offset_minutes": { "type": "integer" },
+        "city": { "type": "string" },
+        "country_code": { "type": "string", "minLength": 2, "maxLength": 2 }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "primary_domains": {
+          "type": "array",
+          "items": { "enum": ["deal", "trading", "launch", "health", "creative", "meetings", "build"] }
+        },
+        "conviction_sensitivity": { "enum": ["conservative", "balanced", "aggressive"], "default": "balanced" },
+        "hybrid_weights_override": { "type": "object", "description": "Partial override of DEFAULT_HYBRID_WEIGHTS" },
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "best_hour_alerts": { "type": "boolean" },
+            "daily_digest": { "type": "boolean" }
+          }
+        },
+        "privacy": {
+          "type": "object",
+          "required": ["storage_mode"],
+          "properties": {
+            "storage_mode": { "enum": ["local_only", "encrypted_sync", "cloud_opt_in"] },
+            "share_anonymized_patterns": { "type": "boolean", "default": false },
+            "retention_days": { "type": "integer", "minimum": 30, "default": 365 }
+          }
+        }
+      }
+    },
+    "intelligence_state": {
+      "type": "object",
+      "description": "Cached pattern-recognition outputs (refreshed on log ingest)",
+      "properties": {
+        "last_computed_at": { "type": "string", "format": "date-time" },
+        "log_count": { "type": "integer" },
+        "phase": { "enum": ["cold_start", "phase1_rules", "phase2_bayesian"] },
+        "combo_scores": { "type": "object", "additionalProperties": { "type": "number" } }
+      }
+    }
+  }
+}

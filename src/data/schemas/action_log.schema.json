@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kala.local/schemas/action_log.schema.json",
+  "title": "Kala Action Log Entry",
+  "description": "One logged action with timing snapshot, conviction, outcome, and tags for pattern learning.",
+  "type": "object",
+  "required": [
+    "id", "user_id", "schema_version", "logged_at", "action_at",
+    "action", "tags", "conviction", "outcome", "timing_snapshot"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "user_id": { "type": "string", "format": "uuid" },
+    "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "logged_at": { "type": "string", "format": "date-time", "description": "When user recorded the entry" },
+    "action_at": { "type": "string", "format": "date-time", "description": "When the action actually occurred" },
+    "action": {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string", "maxLength": 500 },
+        "domain": { "enum": ["deal", "trading", "launch", "health", "creative", "meetings", "build", "other"] },
+        "followed_advisor": { "type": "boolean", "description": "Did user act on Kaal recommendation?" }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "maxLength": 32 },
+      "minItems": 1,
+      "description": "e.g. deal, trading, launch, health, contract, investor"
+    },
+    "conviction": {
+      "type": "object",
+      "required": ["level", "advisor_score"],
+      "properties": {
+        "level": { "enum": ["High", "Medium", "Low"] },
+        "advisor_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "advisor_summary": { "type": "string" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["score"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 10, "description": "0=disaster, 5=neutral, 10=exceptional" },
+        "success": { "type": "boolean", "description": "Derived: score >= 7" },
+        "notes": { "type": "string", "maxLength": 2000 },
+        "recorded_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "timing_snapshot": {
+      "type": "object",
+      "required": ["personal_hour", "panchang", "gg33"],
+      "description": "Frozen state at action_at for pattern matching",
+      "properties": {
+        "timezone_offset_minutes": { "type": "integer" },
+        "personal_hour": {
+          "type": "object",
+          "required": ["number", "quality", "is_master"],
+          "properties": {
+            "number": { "type": "integer" },
+            "quality": { "enum": ["best", "friendly", "caution", "neutral"] },
+            "is_master": { "type": "boolean" },
+            "hour_count": { "type": "integer" },
+            "window_start": { "type": "string", "format": "date-time" }
+          }
+        },
+        "panchang": {
+          "type": "object",
+          "required": ["tithi", "nakshatra", "yoga", "vara", "muhurta_score"],
+          "properties": {
+            "tithi": { "type": "string" },
+            "tithi_phase": { "enum": ["shukla", "krishna", "unknown"] },
+            "nakshatra": { "type": "string" },
+            "yoga": { "type": "string" },
+            "vara": { "type": "string" },
+            "muhurta_score": { "type": "integer", "minimum": 0, "maximum": 100 }
+          }
+        },
+        "gg33": {
+          "type": "object",
+          "required": ["personal_year", "personal_day", "synergy"],
+          "properties": {
+            "personal_year": { "type": "integer" },
+            "personal_day": { "type": "integer" },
+            "daily_number": { "type": "integer" },
+            "synergy": { "enum": ["friendly", "neutral", "enemy", "self"] },
+            "day_animal": { "type": "string" }
+          }
+        },
+        "jyotish": {
+          "type": "object",
+          "properties": {
+            "dasha_maha": { "type": "string" },
+            "dasha_antar": { "type": "string" },
+            "score": { "type": "integer" }
+          }
+        },
+        "combo_key": {
+          "type": "string",
+          "description": "Normalized fingerprint e.g. ph8|muhurta75|pd8|synergy_friendly"
+        }
+      }
+    },
+    "pattern_feedback": {
+      "type": "object",
+      "description": "Filled on ingest by pattern engine",
+      "properties": {
+        "weight_delta_applied": { "type": "number" },
+        "matched_learned_rule": { "type": "string" }
+      }
+    }
+  }
+}

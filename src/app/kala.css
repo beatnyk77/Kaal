@@ -1,0 +1,957 @@
+.kala-shell {
+  text-align: left;
+  padding: 24px 28px 48px;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .kala-shell {
+    padding: 16px 16px 32px;
+  }
+}
+
+.kala-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.kala-nav__tab {
+  font: inherit;
+  font-size: 15px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.kala-nav__tab:hover {
+  border-color: var(--accent-border);
+}
+
+.kala-nav__tab--active {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.kala-page h1 {
+  font-size: 32px;
+  margin: 0 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.kala-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.kala-subtitle {
+  opacity: 0.75;
+  font-size: 14px;
+  margin: 0;
+}
+
+.kala-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.kala-stat {
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+}
+
+.kala-stat strong {
+  color: var(--text-h);
+  font-size: 18px;
+  display: block;
+}
+
+.kala-time-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+}
+
+.kala-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  background: var(--bg);
+}
+
+.kala-card--ph {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.kala-card--synthesis {
+  border-width: 2px;
+  border-color: var(--accent-border);
+}
+
+.kala-card--insights {
+  background: var(--code-bg);
+}
+
+.kala-card--success {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.kala-card h2 {
+  margin-bottom: 12px;
+}
+
+.kala-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.kala-card__title-row h2 {
+  margin-bottom: 0;
+}
+
+.kala-source {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.kala-source--live {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: var(--text-h);
+}
+
+.kala-source--stub {
+  background: var(--code-bg);
+}
+
+.kala-source--fallback {
+  background: rgba(234, 179, 8, 0.12);
+  border-color: rgba(234, 179, 8, 0.4);
+}
+
+.kala-nature {
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.kala-nature--supportive {
+  color: #22c55e;
+}
+
+.kala-nature--challenging {
+  color: #ef4444;
+}
+
+.kala-transit-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kala-transit {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kala-transit--supportive {
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.kala-transit--challenging {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.kala-error-inline {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-h);
+  opacity: 0.75;
+}
+
+.kala-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kala-muted {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.kala-body {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.kala-loading,
+.kala-error,
+.kala-success {
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.kala-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: var(--text-h);
+}
+
+.kala-success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: var(--text-h);
+}
+
+.kala-conviction {
+  border: 2px solid;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.kala-conviction__main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.kala-conviction__level {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.kala-conviction__score {
+  font-size: 42px;
+  font-weight: 800;
+  color: var(--text-h);
+  font-family: var(--mono);
+}
+
+.kala-conviction__label {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.kala-conviction__summary {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.kala-conviction__delta {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-family: var(--mono);
+  opacity: 0.8;
+}
+
+.kala-ph-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.kala-ph-number {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--text-h);
+  line-height: 1;
+}
+
+.kala-ph-quality {
+  font-size: 16px;
+  text-transform: capitalize;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.kala-ph-quality--best {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.kala-ph-quality--friendly {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.kala-ph-quality--caution {
+  border-color: rgba(234, 179, 8, 0.5);
+}
+
+.kala-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.kala-chip {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.kala-chip--good {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.kala-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .kala-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kala-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .kala-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kala-columns ul,
+.kala-card ul {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.5;
+}
+
+.kala-high-conviction {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.kala-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.kala-breakdown {
+  list-style: none;
+  padding: 12px 0 0;
+  margin: 0;
+}
+
+.kala-breakdown li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.kala-pos {
+  color: #22c55e;
+  font-family: var(--mono);
+}
+
+.kala-neg {
+  color: #ef4444;
+  font-family: var(--mono);
+}
+
+.kala-cta-row {
+  margin-top: 8px;
+}
+
+.kala-btn {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.kala-btn:hover:not(:disabled) {
+  border-color: var(--accent-border);
+}
+
+.kala-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kala-btn--primary {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.kala-btn--ghost {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.kala-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.kala-field--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.kala-field input[type='text'],
+.kala-field input[type='date'],
+.kala-field input[type='number'],
+.kala-field input[type='datetime-local'],
+.kala-field select,
+.kala-field textarea {
+  font: inherit;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.kala-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kala-form__snapshot {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--code-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kala-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+/* ─── Intelligence dashboard ─────────────────────────────────────────────── */
+
+.kala-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 800px) {
+  .kala-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kala-metric {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kala-metric__value {
+  font-size: 22px;
+  color: var(--text-h);
+}
+
+.kala-metric__hint {
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+.kala-ph-heatmap {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 160px;
+  margin-top: 16px;
+  padding-top: 8px;
+  overflow-x: auto;
+}
+
+.kala-ph-bar-wrap {
+  flex: 1;
+  min-width: 36px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.kala-ph-bar {
+  width: 100%;
+  max-width: 40px;
+  border-radius: 6px 6px 2px 2px;
+  min-height: 8px;
+  transition: height 0.2s ease;
+}
+
+.kala-ph-bar--excellent {
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+}
+
+.kala-ph-bar--good {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+}
+
+.kala-ph-bar--mixed {
+  background: linear-gradient(180deg, #eab308, #ca8a04);
+}
+
+.kala-ph-bar--poor {
+  background: linear-gradient(180deg, #ef4444, #dc2626);
+}
+
+.kala-ph-bar--empty {
+  background: var(--border);
+  opacity: 0.5;
+}
+
+.kala-ph-bar__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.kala-ph-bar__score {
+  font-size: 10px;
+  font-family: var(--mono);
+  opacity: 0.75;
+}
+
+.kala-dashboard-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 800px) {
+  .kala-dashboard-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kala-conv-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.kala-conv-row {
+  display: grid;
+  grid-template-columns: 72px 1fr 52px;
+  align-items: center;
+  gap: 10px;
+}
+
+.kala-conv-row__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.kala-conv-row__track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.kala-conv-row__fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.kala-conv-row__fill--high {
+  background: #22c55e;
+}
+
+.kala-conv-row__fill--medium {
+  background: #eab308;
+}
+
+.kala-conv-row__fill--low {
+  background: #94a3b8;
+}
+
+.kala-conv-row__value {
+  font-size: 12px;
+  font-family: var(--mono);
+  text-align: right;
+}
+
+.kala-rules {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kala-rule {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+.kala-rule--boost_ph,
+.kala-rule--boost_combo {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+.kala-rule--avoid_ph {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.kala-rule__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.kala-rule__type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-h);
+}
+
+.kala-rule p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.kala-combo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.kala-combo-domain h3 {
+  text-transform: capitalize;
+  margin-bottom: 8px;
+}
+
+.kala-combo-domain ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kala-combo-cell {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kala-combo-cell--high {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.kala-combo-cell--mid {
+  background: rgba(234, 179, 8, 0.08);
+}
+
+.kala-combo-cell--low {
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.kala-combo-cell__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.kala-combo-cell__key {
+  font-size: 11px;
+  font-family: var(--mono);
+  opacity: 0.8;
+  word-break: break-all;
+}
+
+.kala-recent-logs {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kala-recent-log {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+.kala-recent-log__main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.kala-outcome {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.kala-outcome--good {
+  color: #22c55e;
+}
+
+.kala-outcome--low {
+  color: #ef4444;
+}
+
+/* ─── Deal planner ───────────────────────────────────────────────────────── */
+
+.kala-planner-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kala-planner-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.kala-deal-windows {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kala-deal-windows li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.kala-alert-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.kala-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.kala-timeline-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .kala-timeline-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.kala-timeline-row--active {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 1px var(--accent-border);
+}
+
+.kala-timeline-row--best,
+.kala-timeline-row--master {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+.kala-timeline-row--master {
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.kala-timeline-row--friendly {
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.kala-timeline-row--caution {
+  border-color: rgba(234, 179, 8, 0.35);
+}
+
+.kala-timeline-row__time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kala-timeline-row__hour {
+  font-weight: 700;
+  color: var(--text-h);
+  font-family: var(--mono);
+}
+
+.kala-timeline-row__ph {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kala-timeline-row__ph strong {
+  font-size: 16px;
+  color: var(--text-h);
+}
+
+.kala-timeline-row__tier {
+  font-size: 12px;
+  text-transform: capitalize;
+  opacity: 0.8;
+}
+
+.kala-timeline-row__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.kala-timeline-live {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+/* ─── Settings ───────────────────────────────────────────────────────────── */
+
+.kala-settings h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.kala-settings__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 16px 0;
+}
+
+@media (max-width: 640px) {
+  .kala-settings__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kala-settings__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}

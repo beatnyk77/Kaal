@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kala.local/schemas/hybrid_advisor.schema.json",
+  "title": "Hybrid Timing Advisor Response",
+  "type": "object",
+  "required": ["meta", "user", "conviction", "personalHour", "panchang", "jyotish", "gg33", "synthesis", "patternNote"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["version", "generatedAt", "targetDateTime", "timezoneOffsetMinutes", "weights"],
+      "properties": {
+        "version": { "type": "string" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "targetDateTime": { "type": "string", "format": "date-time" },
+        "timezoneOffsetMinutes": { "type": "integer" },
+        "weights": { "$ref": "#/$defs/hybrid_weights" }
+      }
+    },
+    "user": {
+      "type": "object",
+      "required": ["coreNumber", "birthTime"],
+      "properties": {
+        "name": { "type": "string" },
+        "coreNumber": { "type": "integer" },
+        "birthTime": { "type": "string" }
+      }
+    },
+    "conviction": {
+      "type": "object",
+      "required": ["level", "score", "summary"],
+      "properties": {
+        "level": { "enum": ["High", "Medium", "Low"] },
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "summary": { "type": "string" }
+      }
+    },
+    "personalHour": { "$ref": "#/$defs/personal_hour_enriched" },
+    "panchang": { "$ref": "#/$defs/panchang_enriched" },
+    "jyotish": { "$ref": "#/$defs/jyotish_enriched" },
+    "gg33": { "$ref": "#/$defs/gg33_enriched" },
+    "synthesis": { "$ref": "#/$defs/synthesis" },
+    "patternNote": { "$ref": "#/$defs/pattern_note" }
+  },
+  "$defs": {
+    "hybrid_weights": { "type": "object", "description": "See DEFAULT_HYBRID_WEIGHTS in hybridTimingAdvisor.ts" },
+    "personal_hour_enriched": {
+      "type": "object",
+      "required": ["personalHour", "isMaster", "quality", "windowStart", "windowEnd", "coreContext", "recommendationsSeed"],
+      "properties": {
+        "personalHour": { "type": "integer" },
+        "isMaster": { "type": "boolean" },
+        "quality": { "enum": ["best", "friendly", "caution", "neutral"] },
+        "windowStart": { "type": "string", "format": "date-time" },
+        "windowEnd": { "type": "string", "format": "date-time" },
+        "hourCount": { "type": "integer" },
+        "rawSum": { "type": "integer" },
+        "isActive": { "type": "boolean" },
+        "coreContext": {
+          "type": "object",
+          "required": ["coreNumber", "resonance", "whyItMatters", "bestActions", "cautionActions"],
+          "properties": {
+            "coreNumber": { "type": "integer" },
+            "resonance": { "enum": ["amplified", "supportive", "neutral", "challenging", "identity_mirror"] },
+            "whyItMatters": { "type": "string" },
+            "bestActions": { "type": "array", "items": { "type": "string" } },
+            "cautionActions": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "recommendationsSeed": { "type": "object" }
+      }
+    },
+    "panchang_enriched": {
+      "type": "object",
+      "required": ["tithi", "nakshatra", "yoga", "karana", "vara", "muhurta"],
+      "properties": {
+        "tithi": { "type": "object" },
+        "nakshatra": { "type": "object" },
+        "yoga": { "type": "object" },
+        "karana": { "type": "object" },
+        "vara": { "type": "string" },
+        "muhurta": {
+          "type": "object",
+          "required": ["score", "label", "factors"],
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "label": { "enum": ["excellent", "good", "mixed", "caution"] },
+            "factors": { "type": "array" }
+          }
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "jyotish_enriched": {
+      "type": "object",
+      "required": ["source", "dasha", "transits", "score", "summary", "personalHourInteraction"],
+      "properties": {
+        "source": { "enum": ["live", "stub"] },
+        "dasha": { "type": "object" },
+        "transits": { "type": "array" },
+        "score": { "type": "integer" },
+        "summary": { "type": "string" },
+        "personalHourInteraction": { "type": "string" }
+      }
+    },
+    "gg33_enriched": {
+      "type": "object",
+      "required": ["personalYear", "personalDay", "personalYearPhase", "synergy", "coreOverlay"],
+      "properties": {
+        "personalYear": { "type": "integer" },
+        "personalMonth": { "type": "integer" },
+        "personalDay": { "type": "integer" },
+        "dailyNumber": { "type": "integer" },
+        "personalYearPhase": { "type": "object" },
+        "yearAnimal": { "type": "string" },
+        "dayAnimal": { "type": "string" },
+        "synergy": { "enum": ["friendly", "neutral", "enemy", "self"] },
+        "themeNote": { "type": "string" },
+        "coreOverlay": { "type": "object" }
+      }
+    },
+    "synthesis": {
+      "type": "object",
+      "required": ["dos", "donts", "highConvictionActions", "scoringBreakdown", "matchedCrossRules"],
+      "properties": {
+        "dos": { "type": "array", "items": { "type": "string" } },
+        "donts": { "type": "array", "items": { "type": "string" } },
+        "highConvictionActions": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "items": { "$ref": "#/$defs/high_conviction_action" } }
+          ]
+        },
+        "scoringBreakdown": { "type": "array", "items": { "$ref": "#/$defs/scoring_line" } },
+        "matchedCrossRules": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "high_conviction_action": {
+      "type": "object",
+      "required": ["domain", "recommendation", "gatedBy"],
+      "properties": {
+        "domain": { "enum": ["trading", "deals", "launches", "meetings"] },
+        "recommendation": { "type": "string" },
+        "gatedBy": { "type": "string" }
+      }
+    },
+    "scoring_line": {
+      "type": "object",
+      "required": ["system", "label", "delta", "rationale"],
+      "properties": {
+        "system": { "enum": ["personal_hour", "panchang", "gg33", "jyotish", "cross_system"] },
+        "label": { "type": "string" },
+        "delta": { "type": "number" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "pattern_note": {
+      "type": "object",
+      "required": ["status", "message", "futureFields"],
+      "properties": {
+        "status": { "const": "placeholder" },
+        "message": { "type": "string" },
+        "futureFields": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

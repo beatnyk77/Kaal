@@ -1,0 +1,526 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kala.local/schemas/master_numerology.schema.json",
+  "title": "Kala Master Numerology Knowledge Base",
+  "description": "Unified GG33 + Vietnamese numerology + arthouse33 Personal Hours knowledge base for the Kaal engine.",
+  "type": "object",
+  "required": ["meta", "calculation_methods", "number_profiles", "compatibility", "zodiac", "personal_year", "cross_system_rules", "query_indices"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["schema_version", "kb_version", "updated_at", "sources", "changelog"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "kb_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "description": { "type": "string" },
+        "maintainer": { "type": "string" },
+        "license_note": { "type": "string" },
+        "sources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/source" }
+        },
+        "changelog": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/changelog_entry" }
+        },
+        "calibration_flags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Fields pending user/screenshot confirmation."
+        }
+      }
+    },
+    "calculation_methods": {
+      "type": "object",
+      "required": ["reduction", "personal_year", "personal_month", "personal_day", "daily_numbers", "personal_hour"],
+      "additionalProperties": false,
+      "properties": {
+        "reduction": { "$ref": "#/$defs/reduction_rule" },
+        "personal_year": { "$ref": "#/$defs/calc_method" },
+        "personal_month": { "$ref": "#/$defs/calc_method" },
+        "personal_day": { "$ref": "#/$defs/calc_method" },
+        "daily_numbers": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/calc_method" }
+        },
+        "personal_hour": { "$ref": "#/$defs/personal_hour_method" },
+        "birth_time_number": { "$ref": "#/$defs/calc_method" }
+      }
+    },
+    "number_profiles": {
+      "type": "object",
+      "description": "Keys: '1'..'9', '11', '22', '33'",
+      "patternProperties": {
+        "^(?:[1-9]|11|22|33)$": { "$ref": "#/$defs/number_profile" }
+      },
+      "additionalProperties": false
+    },
+    "compatibility": {
+      "type": "object",
+      "required": ["number_matrix", "personal_hour_quality"],
+      "additionalProperties": false,
+      "properties": {
+        "number_matrix": { "$ref": "#/$defs/number_matrix" },
+        "personal_hour_quality": { "$ref": "#/$defs/personal_hour_quality" },
+        "core_amplification": { "$ref": "#/$defs/core_amplification" }
+      }
+    },
+    "zodiac": {
+      "type": "object",
+      "required": ["tradition", "animals", "triads", "enemies", "hidden_friends"],
+      "additionalProperties": false,
+      "properties": {
+        "tradition": { "enum": ["vietnamese", "chinese", "hybrid"] },
+        "vietnam_distinctions": { "type": "array", "items": { "type": "string" } },
+        "lunar_new_year_note": { "type": "string" },
+        "animals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/zodiac_animal" },
+          "minItems": 12,
+          "maxItems": 12
+        },
+        "triads": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } },
+        "enemies": { "type": "object", "additionalProperties": { "type": "string" } },
+        "hidden_friends": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string" } } },
+        "number_animal_map": {
+          "type": "object",
+          "description": "Optional numerology bridge: animal id -> primary number",
+          "additionalProperties": { "type": "integer", "minimum": 1, "maximum": 9 }
+        }
+      }
+    },
+    "personal_year": {
+      "type": "object",
+      "required": ["formula", "cycle_length", "phases", "core_resonance_rules"],
+      "additionalProperties": false,
+      "properties": {
+        "formula": { "type": "string" },
+        "cycle_length": { "type": "integer", "minimum": 1 },
+        "phases": {
+          "type": "object",
+          "patternProperties": {
+            "^[1-9]$": { "$ref": "#/$defs/personal_year_phase" }
+          },
+          "additionalProperties": false
+        },
+        "four_year_energy": { "$ref": "#/$defs/four_year_energy" },
+        "core_resonance_rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/core_resonance_rule" }
+        }
+      }
+    },
+    "cross_system_rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/cross_system_rule" }
+    },
+    "query_indices": {
+      "type": "object",
+      "required": ["by_number", "by_animal", "by_graha", "by_action_tag"],
+      "additionalProperties": false,
+      "properties": {
+        "by_number": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "by_animal": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "by_graha": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "by_action_tag": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Future namespaces (panchang_yogas, user_overrides, pattern_memory) without breaking core schema.",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["id", "name", "type", "access", "ethical_note"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "enum": ["public_web", "academy", "user_screenshot", "book", "engine_derived", "community"] },
+        "url": { "type": "string", "format": "uri" },
+        "access": { "enum": ["open", "subscription", "private", "fair_use_summary"] },
+        "last_verified": { "type": "string", "format": "date" },
+        "ethical_note": { "type": "string" },
+        "ingestion_status": { "enum": ["planned", "partial", "complete", "manual_only"] }
+      }
+    },
+    "changelog_entry": {
+      "type": "object",
+      "required": ["version", "date", "changes"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "changes": { "type": "array", "items": { "type": "string" } },
+        "breaking": { "type": "boolean", "default": false }
+      }
+    },
+    "reduction_rule": {
+      "type": "object",
+      "required": ["algorithm", "preserve_masters", "master_numbers"],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "enum": ["digital_root", "full_sum_once", "custom"] },
+        "preserve_masters": { "type": "boolean" },
+        "master_numbers": {
+          "type": "array",
+          "items": { "type": "integer", "enum": [11, 22, 33] }
+        },
+        "reduce_masters_in_contexts": {
+          "type": "array",
+          "items": { "enum": ["personal_year", "personal_month", "personal_day", "daily_number", "personal_hour"] }
+        }
+      }
+    },
+    "calc_method": {
+      "type": "object",
+      "required": ["id", "label", "formula", "inputs", "output", "reduction"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "formula": { "type": "string" },
+        "inputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "output": { "type": "string" },
+        "reduction": { "type": "string" },
+        "gg33_notes": { "type": "string" },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "input": { "type": "object" },
+              "steps": { "type": "array", "items": { "type": "string" } },
+              "result": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "personal_hour_method": {
+      "type": "object",
+      "required": ["id", "source", "steps", "quality_lookup", "calibration"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "source": { "type": "string" },
+        "label": { "type": "string" },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step", "action"],
+            "properties": {
+              "step": { "type": "integer" },
+              "action": { "type": "string" },
+              "detail": { "type": "string" },
+              "formula": { "type": "string" }
+            }
+          }
+        },
+        "quality_lookup": { "$ref": "#/$defs/personal_hour_quality" },
+        "calibration": {
+          "type": "object",
+          "properties": {
+            "offset_field": { "type": "string" },
+            "default_offset": { "type": "integer" },
+            "verify_script": { "type": "string" }
+          }
+        },
+        "window_rule": { "type": "string" },
+        "reference_anchor": { "type": "string" }
+      }
+    },
+    "number_profile": {
+      "type": "object",
+      "required": ["id", "label", "type", "core_themes", "best_actions", "caution_actions", "friendly_numbers", "enemy_numbers", "neutral_numbers", "graha"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "integer" },
+        "label": { "type": "string" },
+        "type": { "enum": ["root", "master"] },
+        "archetype": { "type": "string" },
+        "core_themes": { "type": "array", "items": { "type": "string" } },
+        "shadow_themes": { "type": "array", "items": { "type": "string" } },
+        "best_actions": { "type": "array", "items": { "type": "string" } },
+        "caution_actions": { "type": "array", "items": { "type": "string" } },
+        "friendly_numbers": { "type": "array", "items": { "type": "integer" } },
+        "enemy_numbers": { "type": "array", "items": { "type": "integer" } },
+        "neutral_numbers": { "type": "array", "items": { "type": "integer" } },
+        "graha": { "$ref": "#/$defs/graha_mapping" },
+        "personal_year_affinity": {
+          "type": "object",
+          "properties": {
+            "amplified": { "type": "array", "items": { "type": "integer" } },
+            "supportive": { "type": "array", "items": { "type": "integer" } },
+            "challenging": { "type": "array", "items": { "type": "integer" } }
+          }
+        },
+        "action_tags": { "type": "array", "items": { "type": "string" } },
+        "gg33_flavor": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "calibration_status": { "enum": ["confirmed", "pending_screenshot", "engine_default"] }
+      }
+    },
+    "graha_mapping": {
+      "type": "object",
+      "required": ["primary", "sanskrit", "western"],
+      "additionalProperties": false,
+      "properties": {
+        "primary": { "type": "string" },
+        "sanskrit": { "type": "string" },
+        "western": { "type": "string" },
+        "element": { "enum": ["fire", "earth", "air", "water", "ether"] },
+        "weekday_lord": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "number_matrix": {
+      "type": "object",
+      "required": ["description", "levels", "entries"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string" },
+        "symmetric": { "type": "boolean", "default": true },
+        "levels": {
+          "type": "array",
+          "items": { "enum": ["ally", "friendly", "neutral", "tension", "enemy"] }
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["a", "b", "level"],
+            "properties": {
+              "a": { "type": "integer" },
+              "b": { "type": "integer" },
+              "level": { "enum": ["ally", "friendly", "neutral", "tension", "enemy"] },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "personal_hour_quality": {
+      "type": "object",
+      "required": ["source", "scope", "tiers"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string" },
+        "scope": { "enum": ["global", "per_core"] },
+        "tiers": {
+          "type": "object",
+          "required": ["best", "friendly", "caution", "neutral"],
+          "properties": {
+            "best": { "type": "array", "items": { "type": "integer" } },
+            "friendly": { "type": "array", "items": { "type": "integer" } },
+            "caution": { "type": "array", "items": { "type": "integer" } },
+            "neutral": { "type": "array", "items": { "type": "integer" } }
+          }
+        },
+        "per_core_overrides": {
+          "type": "object",
+          "patternProperties": {
+            "^[1-9]$": {
+              "type": "object",
+              "properties": {
+                "best": { "type": "array", "items": { "type": "integer" } },
+                "friendly": { "type": "array", "items": { "type": "integer" } },
+                "caution": { "type": "array", "items": { "type": "integer" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "core_amplification": {
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "when_personal_hour_equals_core": { "type": "string" },
+        "when_personal_day_equals_core": { "type": "string" },
+        "when_personal_year_equals_core": { "type": "string" }
+      }
+    },
+    "zodiac_animal": {
+      "type": "object",
+      "required": ["id", "name", "vietnamese_name", "index", "element_cycle_base", "synergy_rules"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "vietnamese_name": { "type": "string" },
+        "chinese_equivalent": { "type": "string" },
+        "index": { "type": "integer", "minimum": 0, "maximum": 11 },
+        "element_cycle_base": { "enum": ["wood", "fire", "earth", "metal", "water"] },
+        "primary_number": { "type": "integer", "minimum": 1, "maximum": 9 },
+        "core_themes": { "type": "array", "items": { "type": "string" } },
+        "best_actions": { "type": "array", "items": { "type": "string" } },
+        "caution_actions": { "type": "array", "items": { "type": "string" } },
+        "friendly_animals": { "type": "array", "items": { "type": "string" } },
+        "enemy_animals": { "type": "array", "items": { "type": "string" } },
+        "neutral_animals": { "type": "array", "items": { "type": "string" } },
+        "number_synergy": {
+          "type": "object",
+          "properties": {
+            "amplified_numbers": { "type": "array", "items": { "type": "integer" } },
+            "friendly_numbers": { "type": "array", "items": { "type": "integer" } },
+            "caution_numbers": { "type": "array", "items": { "type": "integer" } }
+          }
+        },
+        "synergy_rules": {
+          "type": "object",
+          "required": ["triad", "enemy", "self"],
+          "properties": {
+            "triad": { "type": "array", "items": { "type": "string" } },
+            "enemy": { "type": "string" },
+            "self": { "type": "string" },
+            "hidden_friend": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "vietnam_note": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "personal_year_phase": {
+      "type": "object",
+      "required": ["number", "theme", "keywords", "best_actions", "caution_actions"],
+      "additionalProperties": false,
+      "properties": {
+        "number": { "type": "integer", "minimum": 1, "maximum": 9 },
+        "theme": { "type": "string" },
+        "keywords": { "type": "array", "items": { "type": "string" } },
+        "best_actions": { "type": "array", "items": { "type": "string" } },
+        "caution_actions": { "type": "array", "items": { "type": "string" } },
+        "quarter_hints": {
+          "type": "object",
+          "properties": {
+            "q1": { "type": "string" },
+            "q2": { "type": "string" },
+            "q3": { "type": "string" },
+            "q4": { "type": "string" }
+          }
+        }
+      }
+    },
+    "four_year_energy": {
+      "type": "object",
+      "required": ["description", "pattern", "core_4_guidance"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string" },
+        "pattern": { "type": "string" },
+        "years_in_cycle": { "type": "array", "items": { "type": "integer" } },
+        "core_4_guidance": {
+          "type": "object",
+          "required": ["summary", "personal_year_4", "personal_year_8", "stacking_rules"],
+          "properties": {
+            "summary": { "type": "string" },
+            "personal_year_4": { "type": "string" },
+            "personal_year_8": { "type": "string" },
+            "stacking_rules": { "type": "array", "items": { "type": "string" } },
+            "four_year_block_map": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "block_start_py": { "type": "integer" },
+                  "years": { "type": "array", "items": { "type": "string" } },
+                  "emphasis": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "core_resonance_rule": {
+      "type": "object",
+      "required": ["id", "condition", "effect", "strength_modifier"],
+      "properties": {
+        "id": { "type": "string" },
+        "condition": { "type": "string" },
+        "effect": { "type": "string" },
+        "strength_modifier": { "type": "number" },
+        "applies_to": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "cross_system_rule": {
+      "type": "object",
+      "required": ["id", "name", "priority", "conditions", "outcome"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "priority": { "type": "integer", "minimum": 1 },
+        "description": { "type": "string" },
+        "conditions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/rule_condition" }
+        },
+        "outcome": { "$ref": "#/$defs/rule_outcome" },
+        "examples": { "type": "array", "items": { "type": "string" } },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "rule_condition": {
+      "type": "object",
+      "required": ["signal", "operator", "value"],
+      "properties": {
+        "signal": {
+          "enum": [
+            "personal_hour",
+            "personal_hour_quality",
+            "personal_day",
+            "personal_year",
+            "daily_number",
+            "zodiac_synergy",
+            "tithi_phase",
+            "nakshatra_quality",
+            "yoga_strength",
+            "number_compatibility",
+            "core_match"
+          ]
+        },
+        "operator": { "enum": ["eq", "neq", "in", "not_in", "gte", "lte", "matches"] },
+        "value": {}
+      }
+    },
+    "rule_outcome": {
+      "type": "object",
+      "required": ["recommendation_strength", "verdict_bias"],
+      "properties": {
+        "recommendation_strength": { "enum": ["very_high", "high", "moderate", "low", "avoid"] },
+        "verdict_bias": { "type": "number" },
+        "suggested_actions": { "type": "array", "items": { "type": "string" } },
+        "caution_actions": { "type": "array", "items": { "type": "string" } },
+        "domains": { "type": "array", "items": { "type": "string" } },
+        "explanation_template": { "type": "string" }
+      }
+    }
+  }
+}
