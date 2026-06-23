@@ -23,7 +23,8 @@ PANCHANG_CALC="$ROOT/vendor/panchangJS/src/calculator.service.ts"
 if [ -f "$PANCHANG_CALC" ] && grep -q "@angular/core" "$PANCHANG_CALC"; then
   perl -i -0pe 's/import \{ Injectable \} from .@angular\/core.;\s*@Injectable\(\{[^}]*\}\)\s*//s' "$PANCHANG_CALC"
   if ! grep -q '@ts-nocheck' "$PANCHANG_CALC"; then
-    perl -i -pe 's/^/\\/\\/ @ts-nocheck — vendored beatnyk77\\/panchangJS; Kaal patch\\n/' "$PANCHANG_CALC"
+    { echo '// @ts-nocheck — vendored beatnyk77/panchangJS; Kaal standalone patch'; cat "$PANCHANG_CALC"; } > "$PANCHANG_CALC.tmp"
+    mv "$PANCHANG_CALC.tmp" "$PANCHANG_CALC"
   fi
   echo "✓ Applied panchangJS standalone patch"
 fi

@@ -8,6 +8,7 @@ Your unified daily/hourly timing advisor combining Personal Hours, Panchang, Jyo
 
 ```bash
 bun install
+bun run setup:vendor # required once — clones panchangJS + jyotish-api
 bun dev              # Vite app at http://localhost:5173
 bun test             # engine + intelligence tests
 bun run build        # production build → dist/
