@@ -1,10 +1,8 @@
 /**
- * JyotishAdapter — client for jyotish-api (live) with stub/fallback.
+ * JyotishAdapter — beatnyk77/jyotish-api (default) + legacy /v1 mock + stub/fallback.
  *
- * Routes:
- *   POST /v1/dasha/current
- *   POST /v1/transits/active
- *   GET  /health
+ * beatnyk API: GET /api/ping, GET /api/calculate
+ * legacy dev: POST /v1/dasha/current, POST /v1/transits/active, GET /health
  */
 
 export interface BirthChartProfile {
@@ -37,6 +35,14 @@ export interface TransitHit {
 
 export type JyotishSource = 'live' | 'stub' | 'fallback';
 
+export type JyotishApiMode = 'auto' | 'beatnyk' | 'legacy';
+
+export interface JyotishNatalSummary {
+  lagnaSign: string;
+  moonSign: string;
+  moonNakshatra?: string;
+}
+
 export interface JyotishContext {
   source: JyotishSource;
   dasha: DashaPeriod;
@@ -45,6 +51,7 @@ export interface JyotishContext {
   summary: string;
   fetchedAt: string;
   error?: string;
+  natal?: JyotishNatalSummary;
 }
 
 export interface JyotishAdapterOptions {
@@ -52,9 +59,11 @@ export interface JyotishAdapterOptions {
   apiKey?: string;
   useStub?: boolean;
   timeoutMs?: number;
+  /** beatnyk77/jyotish-api (default) vs legacy /v1/* mock */
+  apiMode?: JyotishApiMode;
 }
 
-const DEFAULT_JYOTISH_BASE = 'http://localhost:3001';
+const DEFAULT_JYOTISH_BASE = 'http://localhost:9393';
 
 const VIMSHOTTARI_LORDS = [
   'Ketu',
@@ -269,7 +278,33 @@ export function stubJyotishContext(datetime: Date, birth: BirthChartProfile): Jy
   };
 }
 
-export async function checkJyotishApiHealth(baseUrl: string, timeoutMs = 3000): Promise<boolean> {
+function readApiModeEnv(): JyotishApiMode | undefined {
+  const raw = import.meta.env.VITE_JYOTISH_API_MODE;
+  if (raw === 'beatnyk' || raw === 'legacy' || raw === 'auto') return raw;
+  return undefined;
+}
+
+export function resolveJyotishApiMode(opts: JyotishAdapterOptions): 'beatnyk' | 'legacy' {
+  const mode = opts.apiMode ?? readApiModeEnv() ?? 'auto';
+  if (mode === 'beatnyk') return 'beatnyk';
+  if (mode === 'legacy') return 'legacy';
+
+  const base = (opts.baseUrl ?? '').toLowerCase();
+  if (base.includes('v1/') || base.includes(':3001')) return 'legacy';
+  return 'beatnyk';
+}
+
+export async function checkJyotishApiHealth(
+  baseUrl: string,
+  timeoutMs = 3000,
+  apiMode: JyotishApiMode = 'auto'
+): Promise<boolean> {
+  const mode = resolveJyotishApiMode({ baseUrl, apiMode });
+  if (mode === 'beatnyk') {
+    const { checkBeatnykJyotishHealth } = await import('./jyotishApiBeatnyk');
+    return checkBeatnykJyotishHealth(baseUrl, timeoutMs);
+  }
+
   try {
     const base = baseUrl.replace(/\/$/, '');
     const res = await fetchWithTimeout(`${base}/health`, { method: 'GET' }, timeoutMs);
@@ -289,6 +324,29 @@ export async function getJyotishContext(
   }
 
   try {
+    const mode = resolveJyotishApiMode(opts);
+    if (mode === 'beatnyk') {
+      const { fetchBeatnykJyotishContext } = await import('./jyotishApiBeatnyk');
+      const ctx = await fetchBeatnykJyotishContext(datetime, birth, {
+        baseUrl: opts.baseUrl!,
+        timeoutMs: opts.timeoutMs,
+      });
+      return {
+        source: ctx.source,
+        dasha: ctx.dasha,
+        transits: ctx.transits,
+        score: ctx.score,
+        summary: ctx.summary,
+        fetchedAt: ctx.fetchedAt,
+        natal: ctx.natal
+          ? {
+              lagnaSign: ctx.natal.lagnaSign,
+              moonSign: ctx.natal.moonSign,
+              moonNakshatra: ctx.natal.moonNakshatra,
+            }
+          : undefined,
+      };
+    }
     return await fetchJyotishLive(datetime, birth, opts);
   } catch (err) {
     const fallback = stubJyotishContext(datetime, birth);

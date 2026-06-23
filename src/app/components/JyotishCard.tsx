@@ -21,6 +21,24 @@ export function JyotishCard({ jyotish }: JyotishCardProps) {
         <span className={`kala-source ${source.className}`}>{source.text}</span>
       </div>
 
+      {jyotish.natal && (
+        <div className="kala-grid-2" style={{ marginBottom: 12 }}>
+          <div>
+            <span className="kala-muted">Lagna</span>
+            <p>
+              <strong>{jyotish.natal.lagnaSign}</strong>
+            </p>
+          </div>
+          <div>
+            <span className="kala-muted">Moon</span>
+            <p>
+              <strong>{jyotish.natal.moonSign}</strong>
+              {jyotish.natal.moonNakshatra ? ` · ${jyotish.natal.moonNakshatra}` : ''}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="kala-grid-2">
         <div>
           <span className="kala-muted">Dasha</span>

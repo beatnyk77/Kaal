@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -5,15 +6,21 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   assetsInclude: ['**/*.wasm'],
+  resolve: {
+    alias: {
+      '@vendor/panchangJS': path.resolve(__dirname, 'vendor/panchangJS/src'),
+      '@angular/core': path.resolve(__dirname, 'src/shims/angular-core.ts'),
+    },
+  },
   optimizeDeps: {
     exclude: ['sql.js'],
   },
   server: {
     proxy: {
       '/jyotish-api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:9393',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/jyotish-api/, ''),
+        rewrite: (p) => p.replace(/^\/jyotish-api/, ''),
       },
     },
   },

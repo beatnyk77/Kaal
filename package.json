@@ -10,7 +10,10 @@
     "preview": "vite preview",
     "verify:ph": "bun scripts/verify-personal-hours.ts",
     "example:hybrid": "bun scripts/example-hybrid-advisor.ts",
+    "setup:vendor": "bash scripts/setup-vendor.sh",
     "jyotish:api": "bun scripts/jyotish-api-dev.ts",
+    "jyotish:api:legacy": "bun scripts/jyotish-api-dev.ts",
+    "jyotish:docker": "cd vendor/jyotish-api && docker compose up --build -d",
     "test": "TZ=UTC vitest",
     "test:ui": "vitest --ui"
   },

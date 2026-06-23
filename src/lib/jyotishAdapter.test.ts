@@ -38,7 +38,58 @@ describe('jyotishAdapter', () => {
     expect(ctx.transits.length).toBeGreaterThan(0);
   });
 
-  it('parses live API responses', async () => {
+  it('parses beatnyk jyotish-api responses', async () => {
+    const dt = new Date('2026-06-23T15:28:00+05:30');
+
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('/api/ping')) {
+        return new Response(JSON.stringify({ pong: 'success' }), { status: 200 });
+      }
+      if (url.includes('/api/calculate')) {
+        const isNatal = url.includes('hour=20');
+        const chart = isNatal
+          ? {
+              lagna: { Lg: { rashi: 10 } },
+              graha: { Mo: { rashi: 8, nakshatra: { name: 'Anuradha' } } },
+              dasha: { periods: {} },
+            }
+          : {
+              lagna: { Lg: { rashi: 10 } },
+              graha: { Mo: { rashi: 8, rashiAvastha: 'friend' }, Ju: { rashi: 9, rashiAvastha: 'ucha' } },
+              dasha: {
+                periods: {
+                  Sa: {
+                    start: '2020-01-01 00:00:00',
+                    end: '2030-01-01 00:00:00',
+                    periods: {
+                      Me: { start: '2025-01-01 00:00:00', end: '2027-01-01 00:00:00' },
+                    },
+                  },
+                },
+              },
+              kala: { hora: { key: 'Ve' } },
+            };
+        return new Response(JSON.stringify({ chart }), { status: 200 });
+      }
+      return new Response('not found', { status: 404 });
+    }) as typeof fetch;
+
+    const ctx = await getJyotishContext(dt, BIRTH, {
+      baseUrl: 'http://test.local/jyotish-api',
+      useStub: false,
+      apiMode: 'beatnyk',
+      timeoutMs: 2000,
+    });
+
+    expect(ctx.source).toBe('live');
+    expect(ctx.dasha.maha).toBe('Saturn');
+    expect(ctx.natal?.lagnaSign).toBe('Makara');
+    expect(ctx.natal?.moonSign).toBe('Vrishchika');
+    expect(ctx.transits.length).toBeGreaterThan(0);
+  });
+
+  it('parses legacy /v1 API responses', async () => {
     const dt = new Date('2026-06-23T15:28:00+05:30');
 
     globalThis.fetch = (async (input: RequestInfo | URL) => {
@@ -80,6 +131,7 @@ describe('jyotishAdapter', () => {
     const ctx = await getJyotishContext(dt, BIRTH, {
       baseUrl: 'http://test.local',
       useStub: false,
+      apiMode: 'legacy',
       timeoutMs: 2000,
     });
 

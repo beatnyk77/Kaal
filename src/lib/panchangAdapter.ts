@@ -115,7 +115,7 @@ export interface PanchangOptions {
 }
 
 /**
- * Real panchang via mhah-panchang (schenna/panchangJS astronomical core).
+ * Real panchang via beatnyk77/panchangJS (default) or mhah-panchang fallback.
  */
 export function getPanchang(date: Date, options: PanchangOptions = {}): PanchangData {
   const tz = options.timezoneOffsetMinutes ?? IST_OFFSET_MINUTES;

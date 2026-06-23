@@ -14,13 +14,32 @@ bun run build        # production build → dist/
 bun run verify:ph    # sample Personal Hours table
 ```
 
-### Optional: live Jyotish API (Phase 3)
+### Vendor integrations (beatnyk77 forks)
 
 ```bash
-bun run jyotish:api  # mock vimshottari API on :3001
+bun run setup:vendor   # clone panchangJS + jyotish-api into vendor/
 ```
 
-Copy `.env.example` → `.env`. Default `VITE_JYOTISH_API_URL=/jyotish-api` proxies via Vite dev server.
+| Repo | Role in Kaal |
+|------|----------------|
+| [beatnyk77/panchangJS](https://github.com/beatnyk77/panchangJS) | Default panchang engine (`VITE_PANCHANG_BACKEND=panchangJS`) |
+| [beatnyk77/jyotish-api](https://github.com/beatnyk77/jyotish-api) | Live Vimshottari dasha, lagna, moon, transits via Docker |
+
+### Live Jyotish API
+
+```bash
+bun run setup:vendor
+bun run jyotish:docker   # Symfony API on :9393 — GET /api/calculate
+bun dev                  # proxies /jyotish-api → :9393
+```
+
+Copy `.env.example` → `.env`. Default:
+
+- `VITE_PANCHANG_BACKEND=panchangJS` (mhah-panchang fallback if vendor missing)
+- `VITE_JYOTISH_API_URL=/jyotish-api`
+- `VITE_JYOTISH_API_MODE=beatnyk` (auto-detected)
+
+Legacy bun mock (`jyotish:api:legacy` on :3001): set `VITE_JYOTISH_API_MODE=legacy`.
 
 For static deploy without an API, set `VITE_JYOTISH_USE_STUB=true`.
 
