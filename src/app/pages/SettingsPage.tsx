@@ -12,6 +12,7 @@ import {
   parseImportBundle,
 } from '../../lib/intelligence/dataPortability';
 import { persistActiveStore } from '../../lib/intelligence/storeBootstrap';
+import { KARTIKAY_DOCTRINE } from '../../lib/kartikayDoctrine';
 import { requestNotificationPermission } from '../../lib/planner/windowAlerts';
 import { registerServiceWorker } from '../../lib/planner/alertSchedule';
 
@@ -120,6 +121,11 @@ export function SettingsPage({ store, userId, backend, onProfileSaved }: Setting
         <section className="kala-card">
           <h2>Profile</h2>
           <p className="kala-muted">Birth time drives BTN and Personal Hour transition minute.</p>
+          {profile.id === 'kartikay-default' && (
+            <p className="kala-muted">
+              Kartikay doctrine active ({KARTIKAY_DOCTRINE.meta.version}): conservative conviction, Best/Master PH gate, cold-start hour priors seeded.
+            </p>
+          )}
 
           <div className="kala-settings__grid">
             <label className="kala-field">

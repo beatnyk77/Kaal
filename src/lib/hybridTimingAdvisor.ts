@@ -22,6 +22,13 @@ import {
   evaluateCrossSystem,
   type CompatibilityLevel,
 } from './masterNumerology';
+import {
+  applyPhGate,
+  doctrinePersonalHourExtras,
+  resolveDoctrineWeights,
+  type KartikayDoctrine,
+  type PhGateResult,
+} from './kartikayDoctrine';
 
 // ─── Tunable weights (first-principles defaults) ───────────────────────────
 
@@ -197,6 +204,13 @@ export interface HighConvictionAction {
   gatedBy: string;
 }
 
+export interface PhGateNotice {
+  suppressed: boolean;
+  message: string | null;
+  rawLevel: ConvictionLevel;
+  allowedTiers: string[];
+}
+
 export interface HybridAdvisorResponse {
   meta: {
     version: string;
@@ -204,6 +218,7 @@ export interface HybridAdvisorResponse {
     targetDateTime: string;
     timezoneOffsetMinutes: number;
     weights: HybridScoringWeights;
+    doctrineId?: string;
   };
   user: { name?: string; coreNumber: number; birthTime: string };
   conviction: {
@@ -211,6 +226,7 @@ export interface HybridAdvisorResponse {
     score: number;
     summary: string;
   };
+  phGate: PhGateNotice;
   personalHour: PersonalHourEnriched;
   panchang: PanchangEnriched;
   jyotish: JyotishEnriched;
@@ -316,6 +332,17 @@ function scorePersonalHour(
       rationale: 'Identity-mirror hour — self-alignment boost, not automatically best tier.',
     });
     delta += w.coreHourMatch;
+  }
+
+  const doctrineExtra = doctrinePersonalHourExtras(ph, w);
+  if (doctrineExtra.label && doctrineExtra.delta !== 0) {
+    items.push({
+      system: 'personal_hour',
+      label: doctrineExtra.label,
+      delta: doctrineExtra.delta,
+      rationale: 'Kartikay doctrine: Core-4-friendly / caution PH number bias.',
+    });
+    delta += doctrineExtra.delta;
   }
 
   return { delta: capContribution(delta, w.maxContribution), items };
@@ -430,7 +457,17 @@ export interface HybridAdvisorInput {
   targetDateTime: Date;
   user?: HybridUserProfile;
   weights?: HybridScoringWeights;
+  doctrine?: KartikayDoctrine | null;
   jyotishOptions?: JyotishAdapterOptions;
+}
+
+function buildPhGateNotice(gateResult: PhGateResult, doctrine?: KartikayDoctrine | null): PhGateNotice {
+  return {
+    suppressed: gateResult.suppressed,
+    message: gateResult.message,
+    rawLevel: gateResult.rawLevel,
+    allowedTiers: doctrine?.ph_gate.high_conviction_only_on ?? ['best', 'master'],
+  };
 }
 
 /**
@@ -440,7 +477,10 @@ export async function getHybridTimingAdvice(
   input: HybridAdvisorInput
 ): Promise<HybridAdvisorResponse> {
   const user = input.user ?? KARTIKAY_PROFILE;
-  const weights = input.weights ?? DEFAULT_HYBRID_WEIGHTS;
+  const doctrine = input.doctrine ?? null;
+  const weights =
+    input.weights ??
+    (doctrine ? resolveDoctrineWeights(DEFAULT_HYBRID_WEIGHTS, doctrine) : DEFAULT_HYBRID_WEIGHTS);
   const tz = user.timezoneOffsetMinutes ?? IST_OFFSET_MINUTES;
   const dt = input.targetDateTime;
 
@@ -535,7 +575,11 @@ export async function getHybridTimingAdvice(
   }
 
   score = clamp(Math.round(score), 10, 95);
-  const convictionLevel = convictionFromScore(score, weights.convictionThresholds);
+  const rawConvictionLevel = convictionFromScore(score, weights.convictionThresholds);
+  const gateResult = doctrine
+    ? applyPhGate(ph, rawConvictionLevel, doctrine.ph_gate)
+    : { level: rawConvictionLevel, suppressed: false, message: null, rawLevel: rawConvictionLevel };
+  const convictionLevel = gateResult.level;
 
   const personalHourEnriched: PersonalHourEnriched = {
     personalHour: ph.personalHour,
@@ -552,13 +596,17 @@ export async function getHybridTimingAdvice(
 
   const { dos, donts } = buildDosDontsFromParts(ph, coreContext, panchang, gg33, jyotishEnriched, convictionLevel);
 
-  const summary = [
+  const summaryParts = [
     `Conviction ${convictionLevel} (${score}/100).`,
     `PH ${ph.personalHour} (${ph.quality})`,
     `Muhurta ${panchang.muhurta.score}`,
     `PY${gg33Raw.personalYear}/PD${gg33Raw.personalDay}`,
     `${gg33Raw.synergy} zodiac`,
-  ].join(' · ');
+  ];
+  if (gateResult.suppressed) {
+    summaryParts.push(`PH gate capped ${gateResult.rawLevel}→Medium`);
+  }
+  const summary = summaryParts.join(' · ');
 
   return {
     meta: {
@@ -567,9 +615,11 @@ export async function getHybridTimingAdvice(
       targetDateTime: toIso(dt),
       timezoneOffsetMinutes: tz,
       weights,
+      doctrineId: doctrine?.meta.id,
     },
     user: { name: user.name, coreNumber: user.coreNumber, birthTime: user.birthTime },
     conviction: { level: convictionLevel, score, summary },
+    phGate: buildPhGateNotice(gateResult, doctrine),
     personalHour: personalHourEnriched,
     panchang: {
       tithi: panchang.tithi,

@@ -27,10 +27,15 @@ describe('masterNumerology KB', () => {
     expect(getPHQuality(22)).toBe('best');
   });
 
-  it('resolves number compatibility matrix', () => {
+  it('resolves arthouse33 number compatibility matrix', () => {
     expect(getNumberCompatibility(4, 8)).toBe('ally');
+    expect(getNumberCompatibility(4, 9)).toBe('ally');
     expect(getNumberCompatibility(4, 5)).toBe('enemy');
-    expect(getNumberCompatibility(9, 8)).toBe('friendly');
+    expect(getNumberCompatibility(3, 4)).toBe('enemy');
+    expect(getNumberCompatibility(7, 8)).toBe('enemy');
+    expect(getNumberCompatibility(9, 8)).toBe('neutral');
+    expect(getNumberCompatibility(1, 9)).toBe('enemy');
+    expect(getNumberCompatibility(22, 8)).toBe('ally');
   });
 
   it('loads Vietnamese Cat zodiac with Rooster enemy', () => {

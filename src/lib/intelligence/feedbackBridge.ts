@@ -3,6 +3,7 @@
  */
 
 import type { HybridAdvisorResponse } from '../hybridTimingAdvisor';
+import { applyPhGate, KARTIKAY_DOCTRINE } from '../kartikayDoctrine';
 import type { PatternAdjustments, ActionLogEntry, LearnedRule, UserProfile } from './types';
 import { getPatternAdjustments, determinePhase } from './patternRecognizer';
 import { comboKeyFromSnapshot } from './comboKey';
@@ -26,17 +27,38 @@ export function applyPatternAdjustments(
   let score = advice.conviction.score + adjustments.score_delta;
   score = Math.max(10, Math.min(95, score));
 
+  const thresholds = advice.meta.weights.convictionThresholds;
   let level = advice.conviction.level;
   if (adjustments.conviction_hint === 'upgrade') {
-    if (score >= 72) level = 'High';
-    else if (score >= 52) level = 'Medium';
+    if (score >= thresholds.high) level = 'High';
+    else if (score >= thresholds.medium) level = 'Medium';
   } else if (adjustments.conviction_hint === 'downgrade') {
-    if (score < 52) level = 'Low';
-    else if (score < 72) level = 'Medium';
+    if (score < thresholds.medium) level = 'Low';
+    else if (score < thresholds.high) level = 'Medium';
   } else {
-    if (score >= 72) level = 'High';
-    else if (score >= 52) level = 'Medium';
+    if (score >= thresholds.high) level = 'High';
+    else if (score >= thresholds.medium) level = 'Medium';
     else level = 'Low';
+  }
+
+  let phGate = advice.phGate;
+  if (advice.meta.doctrineId) {
+    const gateResult = applyPhGate(
+      {
+        personalHour: advice.personalHour.personalHour,
+        quality: advice.personalHour.quality,
+        isMaster: advice.personalHour.isMaster,
+      },
+      level,
+      KARTIKAY_DOCTRINE.ph_gate
+    );
+    level = gateResult.level;
+    phGate = {
+      ...advice.phGate,
+      suppressed: gateResult.suppressed,
+      message: gateResult.message,
+      rawLevel: gateResult.rawLevel,
+    };
   }
 
   const insights =
@@ -44,13 +66,22 @@ export function applyPatternAdjustments(
       ? ['Log more actions to unlock personalized timing patterns (need ~8 entries).']
       : adjustments.messages;
 
+  const summaryParts = [
+    advice.conviction.summary,
+    `Learning ${adjustments.score_delta >= 0 ? '+' : ''}${adjustments.score_delta} (n=${adjustments.sample_size})`,
+  ];
+  if (phGate.suppressed && !advice.phGate.suppressed) {
+    summaryParts.push('PH gate capped High→Medium after learning');
+  }
+
   return {
     ...advice,
+    phGate,
     conviction: {
       ...advice.conviction,
       level,
       score,
-      summary: `${advice.conviction.summary} · Learning ${adjustments.score_delta >= 0 ? '+' : ''}${adjustments.score_delta} (n=${adjustments.sample_size})`,
+      summary: summaryParts.join(' · '),
     },
     patternNote: {
       status: 'placeholder',

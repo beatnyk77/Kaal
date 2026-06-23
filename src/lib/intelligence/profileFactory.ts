@@ -1,6 +1,14 @@
 import { IST_OFFSET_MINUTES } from '../panchangJS/personalHours';
 import type { HybridUserProfile } from '../hybridTimingAdvisor';
+import {
+  doctrinePreferencesFromKartikay,
+  KARTIKAY_DOCTRINE,
+  seedLearnedHourWeights,
+} from '../kartikayDoctrine';
 import type { UserProfile } from './types';
+
+const KARTIKAY_PREFS = doctrinePreferencesFromKartikay(KARTIKAY_DOCTRINE);
+const KARTIKAY_HOUR_WEIGHTS = seedLearnedHourWeights(KARTIKAY_DOCTRINE);
 
 export function createKartikayProfile(overrides: Partial<UserProfile> = {}): UserProfile {
   const now = new Date().toISOString();
@@ -35,6 +43,10 @@ export function createKartikayProfile(overrides: Partial<UserProfile> = {}): Use
         source: 'arthouse33_default',
         ...overrides.personal_hours?.quality_tiers,
       },
+      learned_hour_weights: {
+        ...KARTIKAY_HOUR_WEIGHTS,
+        ...overrides.personal_hours?.learned_hour_weights,
+      },
       ...overrides.personal_hours,
     },
     location: {
@@ -47,7 +59,11 @@ export function createKartikayProfile(overrides: Partial<UserProfile> = {}): Use
     },
     preferences: {
       primary_domains: ['deal', 'build', 'meetings'],
-      conviction_sensitivity: 'balanced',
+      conviction_sensitivity: KARTIKAY_PREFS.conviction_sensitivity,
+      hybrid_weights_override: {
+        ...KARTIKAY_PREFS.hybrid_weights_override,
+        ...overrides.preferences?.hybrid_weights_override,
+      },
       privacy: { storage_mode: 'local_only', retention_days: 365 },
       ...overrides.preferences,
     },

@@ -299,31 +299,28 @@
         "notes": { "type": "string" }
       }
     },
-    "number_matrix": {
+    "number_matrix_row": {
       "type": "object",
-      "required": ["description", "levels", "entries"],
       "additionalProperties": false,
       "properties": {
-        "description": { "type": "string" },
-        "symmetric": { "type": "boolean", "default": true },
-        "levels": {
-          "type": "array",
-          "items": { "enum": ["ally", "friendly", "neutral", "tension", "enemy"] }
-        },
-        "entries": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": ["a", "b", "level"],
-            "properties": {
-              "a": { "type": "integer" },
-              "b": { "type": "integer" },
-              "level": { "enum": ["ally", "friendly", "neutral", "tension", "enemy"] },
-              "note": { "type": "string" }
-            }
-          }
-        }
+        "friendly": { "type": "array", "items": { "type": "integer" } },
+        "best": { "type": "array", "items": { "type": "integer" } },
+        "enemy": { "type": "array", "items": { "type": "integer" } },
+        "frenemy": { "type": "array", "items": { "type": "integer" } }
       }
+    },
+    "number_matrix": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": { "type": "string" },
+        "source": { "type": "string" },
+        "symmetric": { "type": "boolean", "default": true }
+      },
+      "patternProperties": {
+        "^[0-9]+$": { "$ref": "#/$defs/number_matrix_row" }
+      },
+      "additionalProperties": false
     },
     "personal_hour_quality": {
       "type": "object",

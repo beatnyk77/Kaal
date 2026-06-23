@@ -29,4 +29,20 @@ if [ -f "$PANCHANG_CALC" ] && grep -q "@angular/core" "$PANCHANG_CALC"; then
   echo "✓ Applied panchangJS standalone patch"
 fi
 
+# Kaal patch: jyotish-api Docker image needs PHP 8.2 (twig ^3.11 requires >=8.1)
+JYOTISH_DOCKERFILE="$ROOT/vendor/jyotish-api/api/Dockerfile"
+if [ -f "$JYOTISH_DOCKERFILE" ] && grep -q 'php7.4-fpm' "$JYOTISH_DOCKERFILE"; then
+  sed -i '' \
+    -e 's/php7\.4/php8.2/g' \
+    -e 's/php\/7\.4/php\/8.2/g' \
+    "$JYOTISH_DOCKERFILE"
+  echo "✓ Applied jyotish-api PHP 8.2 Docker patch"
+fi
+
+JYOTISH_COMPOSER="$ROOT/vendor/jyotish-api/api/composer.json"
+if [ -f "$JYOTISH_COMPOSER" ] && grep -q '"php": ">=7.2.5"' "$JYOTISH_COMPOSER"; then
+  perl -i -pe 's/"php": ">=7\.2\.5"/"php": ">=8.1"/' "$JYOTISH_COMPOSER"
+  echo "✓ Applied jyotish-api composer PHP constraint patch"
+fi
+
 echo "Vendor setup complete."

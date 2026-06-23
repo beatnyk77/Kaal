@@ -8,7 +8,6 @@ export * from './profileFactory';
 export * from './advisorWithLearning';
 export * from './snapshotBuilder';
 export * from './persistence';
-export * from './sqliteStore';
 export * from './storeBootstrap';
 export * from './profileUpdate';
 export * from './dataPortability';

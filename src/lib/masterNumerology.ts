@@ -161,17 +161,61 @@ export function getPHQuality(ph: number): PHQuality {
   return 'neutral';
 }
 
-export function getNumberCompatibility(a: number, b: number): CompatibilityLevel {
-  const entry = MASTER.compatibility.number_matrix.entries.find(
-    (e) => (e.a === a && e.b === b) || (e.a === b && e.b === a)
+interface NumberMatrixRow {
+  friendly?: number[];
+  best?: number[];
+  enemy?: number[];
+  frenemy?: number[];
+}
+
+const COMPAT_RANK: Record<CompatibilityLevel, number> = {
+  enemy: 0,
+  tension: 1,
+  neutral: 2,
+  friendly: 3,
+  ally: 4,
+};
+
+function isMatrixRow(value: unknown): value is NumberMatrixRow {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function getMatrixRow(n: number): NumberMatrixRow | undefined {
+  const row = MASTER.compatibility.number_matrix[String(n) as keyof typeof MASTER.compatibility.number_matrix];
+  return isMatrixRow(row) ? row : undefined;
+}
+
+function levelFromRow(row: NumberMatrixRow, other: number): CompatibilityLevel {
+  if (row.enemy?.includes(other)) return 'enemy';
+  if (row.frenemy?.includes(other)) return 'tension';
+  if (row.best?.includes(other)) return 'ally';
+  if (row.friendly?.includes(other)) return 'friendly';
+  return 'neutral';
+}
+
+function worstCompatibility(levels: CompatibilityLevel[]): CompatibilityLevel {
+  return levels.reduce((worst, level) =>
+    COMPAT_RANK[level] < COMPAT_RANK[worst] ? level : worst
   );
-  if (entry) return entry.level as CompatibilityLevel;
+}
+
+/** arthouse33 grid: best→ally, friendly→friendly, frenemy→tension, enemy→enemy */
+export function getNumberCompatibility(a: number, b: number): CompatibilityLevel {
+  if (a === b) return 'ally';
+
+  const levels: CompatibilityLevel[] = [];
+  const rowA = getMatrixRow(a);
+  const rowB = getMatrixRow(b);
+
+  if (rowA) levels.push(levelFromRow(rowA, b));
+  if (rowB) levels.push(levelFromRow(rowB, a));
+
+  if (levels.length > 0) return worstCompatibility(levels);
 
   const profileA = getNumberProfile(a);
   if (!profileA) return 'neutral';
   if (profileA.friendly_numbers.includes(b)) return 'friendly';
   if (profileA.enemy_numbers.includes(b)) return 'enemy';
-  if (a === b) return 'ally';
   return 'neutral';
 }
 

@@ -263,11 +263,13 @@ export function getPatternAdjustments(input: {
     }
   }
 
-  if (input.phase === 'phase2_bayesian' && input.hourWeights) {
+  if (input.hourWeights) {
     const w = input.hourWeights[String(input.personalHour)];
     if (w !== undefined) {
-      score_delta += Math.round(w * 8);
-      messages.push(`Bayesian PH ${input.personalHour} weight: ${w > 0 ? '+' : ''}${w.toFixed(2)}`);
+      const scale = input.phase === 'phase2_bayesian' ? 8 : 12;
+      score_delta += Math.round(w * scale);
+      const label = input.phase === 'phase2_bayesian' ? 'Bayesian' : 'Cold-start prior';
+      messages.push(`${label} PH ${input.personalHour} weight: ${w > 0 ? '+' : ''}${w.toFixed(2)}`);
     }
   }
 

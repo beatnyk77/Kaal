@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "id": "kartikay-default",
+    "version": "1.0.0",
+    "owner": "Kartikay Sharma",
+    "core_number": 4,
+    "description": "Personal timing doctrine — Best/Master PH gate, Core 4 weighting, cold-start priors"
+  },
+  "ph_gate": {
+    "high_conviction_only_on": ["best", "master"],
+    "suppression_message": "High conviction blocked: your doctrine allows High only in Best or Master Personal Hours (6, 8, 9, 11, 22, 33). Current PH {ph} is {quality}."
+  },
+  "conviction_sensitivity": "conservative",
+  "hybrid_weights_override": {
+    "personalHour": {
+      "best": 28,
+      "friendly": 12,
+      "caution": -24,
+      "neutral": 0,
+      "masterBonus": 10,
+      "coreHourMatch": 5,
+      "maxContribution": 35,
+      "core4_friendly_numbers": [1, 2, 6, 7, 8, 9],
+      "core4_friendly_bonus": 4,
+      "caution_numbers": [3, 5],
+      "caution_extra_penalty": -6
+    },
+    "convictionThresholds": {
+      "high": 75,
+      "medium": 55
+    }
+  },
+  "cold_start_priors": {
+    "learned_hour_weights": {
+      "6": 0.15,
+      "8": 0.25,
+      "9": 0.15,
+      "22": 0.2,
+      "4": 0.1,
+      "3": -0.15,
+      "5": -0.15
+    },
+    "tag_affinities": {
+      "deal": [6, 8, 9, 22],
+      "trading": [6, 8, 9, 22],
+      "launch": [6, 8, 9, 22],
+      "foundation": [4],
+      "strategy": [4],
+      "build": [4]
+    }
+  },
+  "chart_overlays": {
+    "lagna": {
+      "sign": "Capricorn",
+      "notes": "Capricorn Lagna: structure-first execution, long-term foundations, Saturnian discipline. Favor SOPs, contracts, and compounding over flashy pivots."
+    },
+    "moon": {
+      "sign": "Scorpio",
+      "notes": "Scorpio Moon: depth, intensity, and transformation timing. Best for high-stakes conversations after emotional clarity; avoid forcing outcomes during volatile or secretive windows."
+    }
+  }
+}

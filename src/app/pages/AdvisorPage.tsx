@@ -136,6 +136,16 @@ export function AdvisorPage({ store, userId, logCount, onAdviceReady, onGoToLog 
             learningDelta={advice.pattern.adjusted_conviction.delta_from_learning}
           />
 
+          {advice.phGate.suppressed && advice.phGate.message && (
+            <section className="kala-card kala-card--gate" role="status">
+              <h2>PH gate</h2>
+              <p>{advice.phGate.message}</p>
+              <p className="kala-muted">
+                Raw score implied {advice.phGate.rawLevel} conviction — capped at Medium per your doctrine (Best/Master PH only).
+              </p>
+            </section>
+          )}
+
           {advice.pattern.insights.length > 0 && (
             <section className="kala-card kala-card--insights">
               <h2>Learning</h2>
